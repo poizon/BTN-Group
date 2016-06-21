@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<style>
+html,*{margin:0;padding:0;}
+#container{padding:25px;}
+.table-list{list-style-type:none;}
+.table-list{text-align:center;}
+.col{padding:10px;}
+.header{font-weight:bold;border-bottom:1px solid #c0c0c0;text-align:center;}
+</style>
+<script src='/manager/javascript/mootools.js'></script>
+<script>
+var urlGenerator = new Class({
+	initialize: function(){
+		this.name = 'URL generator';
+		this.version = '1.0.0';
+		this.author = 'kosmik8485@gmail.com';
+		this.rq = new Request({
+			url:'/manager/generator_url.pl',
+			method:'post',
+			onSuccess: function(responseText){
+				document.id('result_msg').set('text',responseText);
+			},
+			onFailure: function(){
+				alert('Что-то не так...');
+			}
+		});
+	},
+	getInfo:function(){return this.name;},
+	update:function(opt){},
+	refresh:function(opt){
+		this.rq.send({
+			data:{
+				project_id: opt.project_id,
+				struct_id: opt.struct_id,
+				action: 'ajax',
+				type:opt.type,
+			}
+		});
+	},
+});
+var Urls = new urlGenerator();
+</script>
+</head>
+<body>
+  <div id="container">
+[% IF LIST.size %]
+	<div id="result_msg"></div>
+	<ul class="table-list">
+		<li class="header">
+                        <span class="col">Сервис</span>
+<!--                        <span class="col">База для URL</span>
+                        <span class="col">Без ЧПУ</span>
+                        <span class="col">Заголовок(поле)</span>
+                        <span class="col">Значение(поле)</span>
+                        <span class="col">Правила</span> -->
+                </li>
+
+	[% FOREACH LIST %]
+		<li>			
+			<span class="col">[% header %]</span>
+		<!--	<span class="col"><input id="base_name" type="text" name="base_name" value="[% base_name %]"/></span>
+			<span class="col"><input id="in_url" type="text" name="in_url" value="[% in_url %]"/></span>
+			<span class="col"><input id="header_field" type="text" name="header_field" value="[% header_field %]"/></span>
+			<span class="col"><input id="id_field" type="text" name="id_field" value="[% id_field %]"/></span>
+			<span class="col"><input id="options" type="text" name="options" value="[% options %]"/></span> 
+		-->
+			<button id="btn_ref_1_[% loop.count %]" onclick="Urls.refresh({project_id:[% project_id %],struct_id:[% struct_id %],type:1});">Применить к пустым</button>
+			<button id="btn_ref_2_[% loop.count %]" onclick="Urls.refresh({project_id:[% project_id %],struct_id:[% struct_id %],type:2});">Применить ко всем</button>
+		</li>
+	[% END %]
+	</ul>
+[% ELSE %]
+  <p>Нет таблиц для генерации ЧПУ</p>
+[% END %]
+  </div>
+</body>
+</html>

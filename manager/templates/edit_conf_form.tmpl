@@ -1,0 +1,423 @@
+[%%]
+<html>
+    <head>
+       <title>редактирование конфигурационного файла</title>
+       <style>
+        p,td,div {font-family: arial; font-size: 10pt;}
+        table {border-collapse: collapse; margin-top: 0px;}
+        table.param {margin-bottom: 20px;}
+        table.fields {margin-top: 0px;}
+        /*td.h {font-weight: bold;}*/
+        body {margin-left: 20px;}
+        td {border: 1px solid #999999; padding: 3px;}
+        a:link,a:visited,a:hover{
+                color: #000099;
+                text-decoration: none;
+        }
+        #ChangeParamWindow {
+            border: 1px solid black;
+            width: 400px;
+            height: 120px;
+            background: #eeeeee;
+            padding: 0 5px 5px 5px;
+        }
+
+				#ChangeFieldWindow {
+            border: 1px solid black;
+            width: 800px;
+            height: 900px;
+            background: #eeeeee;
+            padding: 0 5px 5px 5px;
+        }
+        #ChangeFieldWindow input, #ChangeFieldWindow textarea{width: 300px;}
+        #ChangeFieldWindow textarea{width: 400px; height: 200px; font-size: 10px;}
+        #newFormParam {font-family: arial; font-size: 8pt; width: 350px;}
+       img {border: none;}
+       iframe{border: 1px solid black; width:500;height:500;}
+
+       </style>
+       <script src='../main.js'></script>
+			 <script src='../ajax.js'></script>
+			 <iframe name="save"></iframe>
+			 <form name='f' target="save" action="./edit_conf.pl" method='post'>
+					<input type="hidden" name="action" value="save_config">
+					<input type="hidden" id='saved_form' name='saved_form'>
+			 </form>
+       <script>
+
+						// Список атрибутов для формы
+						var form_params=Array('config','db_engine','title','work_table','work_table_id','make_delete','default_find_filter','read_only','tree_use','max_level','sort');
+
+						// список возможных параметров для каждого поля:
+						var loaded_vars=Array('name','db_type','description','type','regexp','error_regexp','uniquew','add_description','values','default_label_empty','default_value_empty','colors','filedir','table','table_id','foreign_key','header_field','value_field','order','read_only','extended', 'default_value', 'tree_table', 'tree_header', 'tree_table_id', 'tree_order', 'fields', 'code', 'relation_table', 'relation_table_header', 'relation_table_id', 'relation_save_table');
+						var max_field_number=[%max_field_number%];
+						var file='[%file%]'; // файл, в который будем сохранять
+						var field=Array();
+						var ChangeParamBlocked=0;
+
+						/* Функция для сохранения конфига */
+						function save_config(){
+								// записываем атрибуты для формы:
+								var config="our %form=(\n";
+								for each (var name in form_params){
+
+									 var type=document.getElementById('form_'+name+'_type').value;
+									 var value=document.getElementById('form_'+name).value
+									  if(value) config=config+name+" => '"+value+"',\n";
+
+								}
+								config+="fields =>\n[\n";
+									// получаем поля
+
+									for (var i=1 ; i<=max_field_number; i++){
+										if(document.getElementById('field_'+i)){
+											config+="{\n";
+											var field=Array();
+
+											eval(document.getElementById('save_field_'+i).innerHTML)
+											for each (var attr in loaded_vars){
+												if(field[attr]!=undefined){
+													var attr_value=field[attr];
+													if(attr!='fields') attr_value=attr_value.replace(/'/g,"\\'");
+													attr_value=attr_value.replace(/&gt;/g,">");
+													attr_value=attr_value.replace(/&lt;/g,"<");
+
+													if(attr=='fields'){
+														config+=attr+" =>\n[\n"+ attr_value+"\n]\n";
+													}
+													else{
+														if(attr_value) config+=""+attr+" => '"+attr_value+"',\n";
+													}
+													field[attr]=''
+												}
+											}
+											config+="},\n";
+										}
+									}
+
+								config+="]\n);";
+								document.getElementById('saved_form').value=config
+								document.f.submit();
+						}
+
+            function OpenChangeParam(param_name){ // функция для редактирования параметра формы
+                if(ChangeParamBlocked) return;
+                ChangeParamBlocked=1;
+
+                var parrent=document.getElementById('save');
+                var ch_div=document.createElement('div');
+                parrent.appendChild(ch_div);
+                ch_div.style.position='absolute';
+                ch_div.style.top=mouse_y;
+                ch_div.style.left=mouse_x-250+'px';
+                ch_div.id='ChangeParamWindow'
+                var v=document.getElementById('form_'+param_name).value;
+                v=v.replace(/"/g,'&quot;');
+                var type=document.getElementById('form_'+param_name+'_type').value;
+                var body="<div style='margin: 0 0 5px 0; padding: 0; text-align:right; border: none; height: 0'><a href='javascript: DropChangeParamWindow()'>[X]</a></div>"+
+                         'Введите новое значение:<br/>';
+                if(type=='text'){
+                    body=body+'<input type="text" id="newFormParam" style="margin-top: 5px;" value="'+v+'"/>';
+                }
+                else if(type=='logic'){
+                    var selected='';
+                    if(v==1) selected=' selected'
+                    body=body+'<p align="center"><select id="newFormParam"><option value="0">нет</option><option value="1"'+selected+'>да</option></select></p>'
+                }
+								else if(type=='select_filter'){ // вывод списка всех полей (для выбора умолчального фильтра)
+									var rexp=/^save_field_[0-9]+$/;
+									body=body+"<select id='newFormParam'><option value=''>Не выбрано</option>";
+									var selected
+
+									for each (var i in document.getElementsByTagName('div')){
+											if(rexp.test(i.id)){
+													eval(i.innerHTML);
+													selected=''
+													if(field['name']==v) selected=' selected'
+													body=body+'<option value="'+field['name']+'"'+selected+'>'+field['name']+' ('+field['description']+')</option>'
+											}
+									}
+									body=body+'</select>';
+								}
+
+								// Автоматика :)
+								if(param_name=='work_table'){
+										var table_select=loadDocAsync('./table_select.pl');
+
+										body=body+table_select;
+								}
+
+								if(param_name=='work_table_id' && 0){
+										var work_table=document.getElementById('form_work_table').value;
+										var table_id_select=loadDocAsync('./table_id_select.pl?work_table='+work_table);
+										body=body+table_id_select;
+								}
+
+								body=body+'<p align="center" style="margin-bottom: 10px;"><input type="button" OnClick="SaveFormParam(\''+param_name+'\')" value="сохранить"></p>';
+								ch_div.innerHTML=body
+								document.getElementById('newFormParam').focus()
+						}
+
+						function DropChangeParamWindow(){ // Функция для удаления окна редактирования параметра формы
+							var parrent=document.getElementById('save');
+							document.getElementById('save').removeChild(document.getElementById('ChangeParamWindow'));
+							ChangeParamBlocked=0;
+						}
+
+						function SaveFormParam(param_name){
+							// сохраняем атрибуты сущности
+							var v=document.getElementById('newFormParam').value;
+							var type=document.getElementById('form_'+param_name+'_type').value;
+							document.getElementById('form_'+param_name).value=v;
+							if(type=='text' || type=='select_filter')
+								document.getElementById('view_form_'+param_name).innerHTML=v;
+							else if(type=='logic'){
+								if(v==1)
+									document.getElementById('view_form_'+param_name).innerHTML='да';
+								else
+									document.getElementById('view_form_'+param_name).innerHTML='нет';
+							}
+
+							if(param_name == 'work_table'){ // для автоматического заполнения work_table_id
+								document.getElementById('form_work_table_id').value=v+'_id'
+								document.getElementById('view_form_work_table_id').innerHTML=v+'_id'
+							}
+							DropChangeParamWindow();
+						}
+
+
+            function OpenChangeField(field_number){
+						// Окно для изменения поля сущности
+							  if(ChangeParamBlocked) return;
+                ChangeParamBlocked=1;
+                var parrent=document.getElementById('save');
+                var ch_div=document.createElement('div');
+                parrent.appendChild(ch_div);
+                ch_div.style.position='absolute';
+                ch_div.style.top=mouse_y-300;
+                ch_div.style.left='15px';
+                ch_div.id='ChangeFieldWindow'
+								// кнопка закрытия окна
+								var body="<div style='margin: 0 0 15px 0; padding: 0; text-align:right; border: none; height: 0'>"+
+												   "<a href='javascript: DropChangeFieldWindow()'>[X]</a>"+
+												 "</div>";
+
+								body=body+"<div id='field_table'></div>"+
+													"<p><input type='button' value='сохранить' OnClick='save_field_window("+field_number+")'></p>";
+
+								// получаем параметры элемента (если таковые есть)
+								eval(document.getElementById('save_field_'+field_number).innerHTML);
+								correct_loaded_vars();
+								document.getElementById(ch_div.id).innerHTML=body;
+
+							 // Загружаем шаблон соответствующего типа:
+									 document.getElementById('field_table').innerHTML=loadDocAsync('./field_load.pl?work_table='+document.getElementById('form_work_table').value+'&type='+field['type']);
+
+							 //Заполняем поля шаблона:
+							 //document.getElementById('description').value=field['description'];
+
+							 for each (var cur_name in loaded_vars){
+									if(document.getElementById(cur_name) && field[cur_name]){
+										document.getElementById(cur_name).value=field[cur_name]
+									}
+								}
+
+
+							// Загружаем поле с типами:
+							loadDoc('./types_in_field.pl?type='+field['type'],'TypeFieldSelect')
+	    			}
+
+						function correct_loaded_vars(){ // корректируем переменные (заморочки html => text)
+							 for each (var cur_name in loaded_vars){
+									if(field[cur_name]!=undefined){
+										field[cur_name]=html_to_text(field[cur_name])
+									}
+								}
+						}
+
+		 				function html_to_text(str){
+							str=str.replace(/&gt;/g,'>');
+							str=str.replace(/&lt;/g,'<');
+							str=str.replace(/&quote;/g,'"');
+							str=str.replace(/;/g,';\n');
+							return str
+						}
+
+						function CreateField(){
+								var div_id=initFieldWindow();
+								// кнопка закрытия окна
+								var body="<div style='margin: 0 0 15px 0; padding: 0; text-align:right; border: none; height: 0'>"+
+												   "<a href='javascript: DropChangeFieldWindow()'>[X]</a>"+
+												 "</div>";
+								body=body+"<div id='field_table'></div>"+
+													"<p><input type='button' value='сохранить' OnClick='save_new_field()'></p>";
+								div_id.innerHTML=body;
+
+								document.getElementById('field_table').innerHTML=loadDocAsync('./field_load.pl?type=text&work_table='+document.getElementById('form_work_table').value);
+								loadDoc('./types_in_field.pl?type=','TypeFieldSelect');
+						}
+
+						function loadNewType(type){
+							 for each (var cur_name in loaded_vars){
+									if(document.getElementById(cur_name)){
+										field[cur_name]=document.getElementById(cur_name).value
+									}
+								}
+								var work_table=document.getElementById('form_work_table').value
+								document.getElementById('field_table').innerHTML=loadDocAsync('./field_load.pl?work_table='+work_table+'&type='+type);
+								var work_table=document.getElementById('form_work_table').value;
+								loadDoc('./types_in_field.pl?work_table='+work_table+'&type='+type,'TypeFieldSelect');
+							 	for each (var cur_name in loaded_vars){
+									if(typeof(field[cur_name])!='undefined' && document.getElementById(cur_name)){
+										document.getElementById(cur_name).value=field[cur_name]
+									}
+								}
+						}
+
+						function initFieldWindow(){
+								if(ChangeParamBlocked) return;
+                ChangeParamBlocked=1;
+                var parrent=document.getElementById('save');
+                var ch_div=document.createElement('div');
+                parrent.appendChild(ch_div);
+                ch_div.style.position='absolute';
+                ch_div.style.top=mouse_y-300;
+                ch_div.style.left='15px';
+                ch_div.id='ChangeFieldWindow';
+								return document.getElementById(ch_div.id)
+						}
+
+						function save_field_window(field_number){ // сохраняем изменения, сделанные относительно поля, в форму
+							var save_field=''
+								// В таблицу со списком полей записываем description и type
+								document.getElementById('field_'+field_number+'_description').innerHTML=document.getElementById('description').value;
+								document.getElementById('field_'+field_number+'_type').innerHTML=document.getElementById('type').value;
+							 for each (var cur_name in loaded_vars){
+									if(document.getElementById(cur_name)){
+										var cur_value=document.getElementById(cur_name).value
+										cur_value=cur_value.replace(/\\/g,'\\\\');
+										cur_value=cur_value.replace(/('|")/g,'\\$1');
+										cur_value=cur_value.replace(/\n/g,'\\n');
+										save_field=save_field+"field['"+cur_name+"'] = '"+cur_value+"';\n";
+									}
+								}
+
+								document.getElementById('save_field_'+field_number).innerHTML=save_field;
+
+								DropChangeFieldWindow();
+						}
+						function DropChangeFieldWindow(){
+                var parrent=document.getElementById('save');
+                document.getElementById('save').removeChild(document.getElementById('ChangeFieldWindow'));
+                ChangeParamBlocked=0;
+						}
+
+						function DropField(num_id){
+   							var d = document;
+   							var tbody = d.getElementById('field_'+num_id).parentNode;
+   							tbody.removeChild(d.getElementById('field_'+num_id));
+						}
+
+						function save_new_field(){ // сохраняет данные в форму, добавляя строку в таблице с полями:
+   						var d = document;
+   						// Находим нужную таблицу
+   						var tbody = d.getElementById('tab_fields').getElementsByTagName('TBODY')[0];
+
+ 							// Создаем строку таблицы и добавляем ее
+   						var row = d.createElement("TR");
+   						tbody.appendChild(row);
+							max_field_number++
+   						row.id='field_'+max_field_number;
+
+   						// Создаем ячейки в вышесозданной строке
+   						// и добавляем тх
+   						var td1 = d.createElement("TD");
+   						var td2 = d.createElement("TD");
+   						var td3 = d.createElement("TD");
+   						var td4 = d.createElement("TD");
+
+
+   						row.appendChild(td1);
+   						row.appendChild(td2);
+   						row.appendChild(td3);
+   						row.appendChild(td4);
+
+
+   						// Наполняем ячейки
+
+   						td4.innerHTML ="<div style='display: nonex' id='save_field_"+max_field_number+"'></div>"+
+														 "<a href='javascript: OpenChangeField("+max_field_number+")'><img src='/icon/edit.gif'/></a>"+
+														 "<a href='javascript: DropField("+max_field_number+")'><img src='/icon/delete.gif'/></a>";
+
+							td1.id='field_'+max_field_number+'_description'
+							td2.id='field_'+max_field_number+'_type'
+
+							save_field_window(max_field_number)
+							max_field_number++;
+							//DropChangeFieldWindow();
+						}
+
+						function load_field_name(work_table, id){
+							loadDoc('./load_field_name.pl?work_table='+work_table,id)
+						}
+
+						function field_name_to_text(value){
+							document.getElementById('field_name').innerHTML='<input type="text" id="name" value="'+value+'"';
+						}
+
+						function set_db_type(type){
+							document.getElementById('db_type').value=type
+						}
+       </script>
+    </head>
+
+    <body>
+			 <p><a href='./construct.pl'>К редактированию разделов</a></p>
+       <div id='save'></div>
+       <p><b>Редактирование конфигурационного файла</b></p>
+       <div>Общие настройки:</div>
+       <table class='param'>
+        [%FOREACH p IN know_params%]
+					 [%k=p.name%]
+            <tr>
+                <td class='h'>[%p.header%]: </td>
+                <td>
+                    <span id='view_form_[%k%]'>[%p.view_form%]</span>
+                    <input type='hidden' name='form_[%p.name%]' id='form_[%p.name%]' value="[%p.value%]"/>
+                    <input type='hidden' id='form_[%p.name%]_type' value="[%p.type%]"/>
+                </td>
+                <td>
+                    <a href="javascript: OpenChangeParam('[%k%]', 'form_[%k%]')">изменить</a>
+                </td>
+            </tr>
+        [%END%]
+        </table>
+
+        <p><b>Поля формы:</b></p>
+				<p><a href='javascript: CreateField()'><img src='/icon/new.gif' align='absmiddle='/></a></p>
+        <table class='fields' id='tab_fields'>
+            <tr>
+                <td>Название</td>
+                <td>Тип</td>
+                <td>Сортировка</td>
+                <td>Дополнительно</td>
+            </tr>
+				[%field_number=1%]
+        [%FOREACH f IN fields%]
+            <tr id='field_[%field_number%]'>
+                <td id='field_[%field_number%]_description'>[%f.display%]</td>
+                <td id='field_[%field_number%]_type'>[%f.type%]</td>
+                <td></td>
+                <td>
+										<div style='display: nonex;' id='save_field_[%field_number%]'>[%f.save_field%]</div>
+										<a href="javascript: OpenChangeField([%field_number%])"><img src='/icon/edit.gif'/></a>
+										<a href="javascript: DropField([%field_number%])"><img src='/icon/delete.gif'/></a>
+								</td>
+            </tr>
+						[%field_number=(field_number+1)%]
+        [%END%]
+				</table>
+
+				<p><input type="button" value="Сохранить" OnClick="save_config()"></p>
+    </body>
+</html>

@@ -1,0 +1,33 @@
+[% USE CGI %]
+
+<style>
+    select { font-size: 1.1em; margin: 1em 0em 1em 0em; }
+</style>
+
+
+[% IF CGI.param('data') == 'form_send' %]
+[% ELSE %]
+
+
+<p>Список доступных опций<p>
+<hr/>
+
+<form action="" >
+<input type="hidden" name="data" value="form_send" />
+<input type="hidden" name="project_id" value="[% project_id %]" />
+<input type="hidden" name="struct_id" value="[% struct_id %]" />
+<input type="hidden" name="action" value="add" />
+
+<select name="options">
+ <option value="">выберите опцию для добавления в список</option>
+ [% FOREACH i IN OPTIONS %]
+ <option value="[% i.id %]">[% i.name %] - [% i.header %]</option>
+ [% END %]
+</select>
+
+<br/>
+<input type="submit" value="добавить опцию в сервис" />
+
+</form>
+
+[% END %]

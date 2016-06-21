@@ -1,0 +1,7 @@
+<ul class="crumbs list">
+  <li class="item"><a class="link" href="/">Главная</a></li>
+  [% FOREACH PATH_INFO %]
+    <li class="item">[% IF loop.last ; header ; ELSE %]<a class="link" href="[% href | get_url %]">[% header %]</a>[% END %]</li>
+  [% END %]
+  [% '<li class="item">' _ content.header _ '</li>' UNLESS PATH_INFO.size %]
+</ul>

@@ -1,0 +1,39 @@
+<html>
+	<head>
+		<title>Быстрая загрузка фото для товаров</title>
+		<script type="text/javascript" src="./javascript/jquery-1.3.2.js"></script>
+		<script type="text/javascript" src="./javascript/ajaxupload/ajaxupload.js"></script>
+		<script type="text/javascript" src="./javascript/lightbox/jquery.lightbox-0.5.pack.js"></script>
+		<link href="./javascript/lightbox/jquery.lightbox-0.5.css" rel="stylesheet" type="text/css" media="screen, projection" />
+		<script type="text/javascript" src="fast_load_photo_good.js"></script>
+
+
+<style>
+body{ font-family: Arial,Helvetica,sans-serif;}
+table{vertical-align:middle; text-align:center; table-layout:fixed; width:190px; height:170px; border:1px solid #d9d7d7; background:#fff;float: left; }
+ul>li{ overflow:hidden; display:block;vertical-align:top; text-align:left; margin-bottom:10px;}
+.o{overflow:hidden; display:block; background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    border-collapse: collapse;
+    border-spacing: 0;
+    list-style: none outside none;
+    margin: 0;
+    padding-left: 10px;
+    vertical-align: baseline;}
+table img{vertical-align:top; max-width:100%; max-height:100%; border:0 none;}
+</style>
+	</head>
+	<body style="padding:20px;">
+		<h2>Быстрая загрузка фото для товаров</h2>		
+		<p>
+			<input id="count_all_goods" value="0" type="hidden">			
+			<input id="count_good_from" value="0" type="hidden">	
+			<input id="rubricator_id" value="" type="hidden">			
+			<button id="all_goods">Загрузить все товары</button>			
+			<div id="select_rub_div">
+				[%select_rub_level_1%]
+			</div>
+			<a id="more_goods_link" href="#" style="visibility:hidden;"><i id="more_goods_link_counter"></i>Показать ещё?</a>
+		</p>
+	</body>
+</html>

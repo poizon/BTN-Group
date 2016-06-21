@@ -1,0 +1,224 @@
+<html>
+	<head>
+		<title>[%form.title%]</title>
+		[%IF form.external_css %]
+			[% form.external_css %]
+		[%END %]
+		<script language="javascript" type="text/javascript" src="./svcalendar.js"></script>
+		<script language="javascript" type="text/javascript" src="./ajax.js"></script>
+		<script language="javascript" type="text/javascript" src="./main.js"></script>
+		[%IF form.use_wysiwyg%]
+			[% IF form.project_id == 45843 %]
+			<script src="/tinymce4/tinymce.min.js"></script>
+			<script src="/tinymce4/settings.js"></script>
+			[% ELSE %]
+			<script language="javascript" type="text/javascript" src="/tinymce/tiny_mce.js"></script>
+
+			<script language="javascript" type="text/javascript" src="/tinymce/head[% '.avtomatika' IF form.project_id == 4258 || form.project_id == 4399 %].js"></script>
+			
+			[% END%]
+		[%END%]
+		[%IF form.use_codelist%]			
+			<script language="javascript" type="text/javascript" src="/js-modules/editarea/edit_area_full.js"></script>
+		[%END%]
+
+		[%IF form.project_id == 1615 || form.project_id == 3930 %]
+		<script>
+			//var h = document.getElementById('header');
+			String.prototype.translit = (function(){
+    			var L = {
+				'А':'A','а':'a','Б':'B','б':'b','В':'V','в':'v','Г':'G','г':'g',
+				'Д':'D','д':'d','Е':'E','е':'e','Ё':'Yo','ё':'yo','Ж':'Zh','ж':'zh',
+				'З':'Z','з':'z','И':'I','и':'i','Й':'Y','й':'y','К':'K','к':'k',
+				'Л':'L','л':'l','М':'M','м':'m','Н':'N','н':'n','О':'O','о':'o',
+				'П':'P','п':'p','Р':'R','р':'r','С':'S','с':'s','Т':'T','т':'t',
+				'У':'U','у':'u','Ф':'F','ф':'f','Х':'Kh','х':'kh','Ц':'Ts','ц':'ts',
+				'Ч':'Ch','ч':'ch','Ш':'Sh','ш':'sh','Щ':'Sch','щ':'sch','Ъ':'"','ъ':'"',
+				'Ы':'Y','ы':'y','Ь':"'",'ь':"'",'Э':'E','э':'e','Ю':'Yu','ю':'yu',
+				'Я':'Ya','я':'ya',' ':'_',
+		        },
+		        r = '',
+		        k;
+			for (k in L) r += k;
+			r = new RegExp('[' + r + ']', 'g');
+			k = function(a){
+			        return a in L ? L[a] : '';
+			};
+			return function(){
+			        return this.replace(r, k);
+			};
+			})();
+		</script>
+		[%END%]
+
+		<link href='ncss/base.css' rel="stylesheet" />
+		<link href='ncss_css/ie.css' rel="stylesheet" />
+		<link href='ncss/window.css' rel="stylesheet" />
+
+		[% BLOCK xxxnahnah %]
+		
+		[% END %]
+		[%IF form.extend_css %]
+		<style>
+			[% form.extend_css %]
+		</style>
+		[% END %]
+		[%IF form.use_1_to_m%]
+		<script>
+			// для сортировки в элементе 1_to_m
+		function move(ob){
+			/* key,cur_id, field, config,down_up
+				key -- id-шник основного элемента
+				cur_id -- id-шник дочернего элемента
+				field -- имя основного элемента 1_to_m
+				down_up -- 0: вниз ; 1: вверх
+			*/
+			var div_id;
+			if(ob.parent_id)
+				div_id=ob.field+'_sub'+ob.parent_id;
+			else
+				div_id='1_to_m_'+ob.field;
+				
+			document.getElementById(div_id).innerHTML=
+				loadDocAsync('./load_1_to_m.pl?cur_id='+ob.cur_id+
+											'&config='+ob.config+'&field='+ob.field+'&id='+
+											ob.key+'&action=down_up&du='+ob.down_up+'&parent_id='+ob.parent_id
+				)
+		}
+		
+		function load_child_1_to_m(id,field){
+			// Загружает подуровень в 1_to_m (для древовидной структуры)
+			/* id -- parent_id */
+			// 1. заменяем кнопку
+			document.getElementById(field+'_but'+id).innerHTML='<a href="javascript: hide_child_1_to_m('+id+','+'\''+field+'\''+')"><img src="/icon/minusx.gif"></a>'
+			
+			// 2. загружаем ветки
+			var key=document.getElementById('id').value;
+			var config=document.getElementById('config').value;
+			var to_load=document.getElementById(field+'_sub'+id)
+			to_load.style.display='';
+			if(!to_load.innerHTML){
+				to_load.innerHTML='<img src="/icon/ajax-loader.gif"/>'
+				to_load.innerHTML=loadDocAsync('./load_1_to_m.pl?action=load_child&id='+key+'&config='+config+'&parent_id='+id+'&field='+field);
+			}
+			
+		}
+		
+		function hide_child_1_to_m(id,field){
+			document.getElementById(field+'_but'+id).innerHTML='<a href="javascript: load_child_1_to_m('+id+','+'\''+field+'\''+')"><img src="/icon/plusx.gif"></a>'
+			document.getElementById(field+'_sub'+id).style.display='none';
+		}
+		
+		/* объект с методом удаления элемента 1_to_m */
+		function del_1_to_m(ob){
+			//alert(ob.parent_id);
+			if(ob.parent_id && ob.parent_id!='0')
+				source_div=ob.name+'_sub'+ob.parent_id
+			else
+				source_div='1_to_m_'+ob.name;
+				
+			loadDoc('./load_1_to_m.pl?action=del&config='+ob.config+
+							'&id='+ob.key+'&field='+ob.field+'&cur_id='+ob.cur_id+'&parent_id='+ob.parent_id,
+							source_div
+			)
+		}
+
+	</script>
+	[%END%]
+	
+	<script>
+	function startFirst(){
+		[% IF form.javascript.onload.size #IF form.javascript.onload.size && form.javascript.onload.size != 1 %]
+			[% FOREACH i IN form.javascript.onload %]
+				[% i %];
+			[% END %]
+		[% #ELSIF form.javascript.onload.size == 1 ; form.javascript.onload %]
+		[% END %]
+	}	
+	</script>
+
+	[%FOREACH i IN form.javascript.include%]<script src='[%i%]'></script>[%END%]
+
+	[% IF form.javascript.test_body.size %]<script>[%form.javascript.test_body%]</script>[%END%]
+	[% IF form.javascript.before_load %]<script>[% form.javascript.before_load %]</script>[% END %]
+	</head>
+
+
+	[% IF form.javascript.onload.size == 1 %]
+	<body[%IF form.javascript.onload %] onload="[%form.javascript.onload%]"[%END%]>
+	[% ELSIF  form.javascript.onload.size && form.javascript.onload.size != 1 %]
+	<body onload="startFirst();">
+	[% END %]
+	
+	<div class="h2">[%form.title%]</div>
+	<div class="window">
+		[%IF form.errors%]<div id='errors'>[%form.errors%]</div>[%END%]		
+		<form method='post' enctype='multipart/form-data'[%IF form.on_ajax_update%] target='for_save'[%END%]>
+			<input type='hidden' name='config' id='config' value='[%form.config%]'>
+			<input type='hidden' name='action' id='action' value='[%form.action%]'>
+			[%IF form.id%]<input type='hidden' name='id' id='id' value='[%form.id%]'>[%END%]
+			<table class='mform'>
+				[%FOREACH element IN form.fields%]
+					[%NEXT IF (element.type.match('^filter_'))%]
+					[%name=element.name%]
+					[%IF element.type == 'hidden'%]
+						[%form.fld.$name%]
+					[%ELSIF element.type == 'html' %]
+						<tr>
+						<td colspan='2'>[%form.fld.$name%]</td>
+						</tr>
+					[%ELSIF element.type == 'link'%]
+						<tr><td colspan='2'>[%form.fld.$name%]</td></tr>
+					[%ELSE%]
+						<tr>
+							<td class='description'>
+								[%element.description%]:
+								[%IF element.add_description%]<br/><small>([%element.add_description%])</small>[%END%]
+							</td>
+							<td>[%form.fld.$name%]</td>
+						</tr>
+					[%END%]
+				[%END%]
+
+				[%IF !form.readonly && !form.read_only%]
+					<tr>
+						<td colspan='2'><div class="hr"></div></td>
+					</tr>
+					<tr>
+						<td colspan='2'><div class="btn1 pl-75">
+						[% IF form.javascript.origurl && !form.javascript.onsave %]
+							<input type="button" onclick="titleConv2Lat();document.forms[0].submit();" value="сохранить данные">
+						[% ELSIF form.javascript.onsave %]
+							<input type="button" onclick="[% form.javascript.onsave %]" value="Сохранить данные">
+						[% ELSE %]
+							<input type='submit' value='сохранить данные'></div></td>
+						[% END %]
+					</tr>
+				[%END%]
+			</table>
+			</div>
+		</form>
+		[%
+		IF form.on_ajax_update || form.use_1_to_m
+		# Данный IFRAME используется для операций (ajax) с 1_to_m, а также при ajax-сохранении форм:
+		#		- удаление элементов
+		#		-	сортировка
+		%]
+			
+			<iframe name='for_save' id='for_save' style='width: 0; height: 0; border: 0;'>
+			</iframe>
+		[%END%]
+
+		[% IF form.project_id == 3930 %]
+		<script>
+			function h2u(){
+				var h = document.getElementById('header').value.translit();
+				document.getElementById('url').value='/' + h;
+			}
+		</script>
+		[% END %]
+		[% IF form.javascript.after_load %]
+		<script>[% form.javascript.after_load %]</script>
+		[% END %]
+	</body>
+</html>

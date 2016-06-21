@@ -1,0 +1,151 @@
+<html>
+	<head>
+	<title>morgImgBrowser - 
+		[%IF type_window=='image'%]
+		Загрузка и выбор изображения
+		[%ELSE%]
+		Загрузка и выбор файла
+		[%END%]
+	</title>
+    
+    <link href="styles.css" type="text/css" rel="stylesheet">       
+	<script language="javascript" type="text/javascript" src="[%tiny_mce_www%]tiny_mce.js"></script>
+	<script language="javascript" type="text/javascript" src="[%tiny_mce_www%]tiny_mce_popup.js"></script>
+	<script language="javascript" type="text/javascript" src="upload.js"></script>
+           
+	</head>
+	<body>
+		
+	<div class="top_menu">
+		<table class="menu">
+			<tr>
+				<td><a href="?[%IF type>1%]type_v=[%type%]&[%END%][%IF folder%]folder=[%folder%]&[%END%]">Файлы</a></td>
+				<td><a href="?[%IF type>1%]type_v=[%type%]&[%END%][%IF folder%]folder=[%folder%]&[%END%]action=upload">Загрузить файл</a></td>	        
+				[%IF action!='upload'%]
+				<td><a href="javascript: DelFormSend();">Удалить файлы</a></td>
+				<td><a href="?[%IF type>1%]type_v=[%type%]&[%END%][%IF folder%]folder=[%folder%]&[%END%]action=folder_new&" onclick="return getDirName(this)">Создать каталог</a></td>
+				[%END%]
+			</tr>
+		</table>
+	</div>
+	
+	<div class="h">
+	[%IF action=='upload'%]
+		<h3>Загрузка файла</h3>
+		<form action="" method="post" name="fupload" enctype="multipart/form-data">
+			<input type="hidden" name="type_v" value="[%type%]">
+        	<input type="hidden" name="action" value="upload">
+            <input type="hidden" name="folder" value="[%folder%]">        	
+        	<table border="0" id="table1">
+                <tr>
+                	<td colspan="3"><input type="submit" value="Закачать"></td>
+                </tr>
+                <tr>
+                	<td width="50" nowrap>Файл&nbsp;1</td>
+                	<td width="100"><input name="fileload" type="file"></td>
+                	<td width="100"><input type="button" value="Добавить" onclick="TableAddRow('table1')"></td>
+                </tr>
+            </table>
+            <center><input type="hidden" value="Закачать"></center>
+        </form>
+	[%ELSE%]
+		<table cellpadding="5">
+		    <tr>
+		        <td>Вид: </td>
+		        <td>
+		        	[%IF type==1%]
+		        	<b>Списком</b>
+		        	[%ELSE%]
+		        	<a href="?[%IF folder%]folder=[%folder%]&[%END%]type_v=1">Списком</a>
+		        	[%END%]
+		        </td>
+		        <td>
+		        	[%IF type==2%]
+		        	<b>Детальный просмотр</b>
+		        	[%ELSE%]
+		        	<a href="?[%IF folder%]folder=[%folder%]&[%END%]type_v=2">Детальный просмотр</a>
+		        	[%END%]
+		        </td>
+		    </tr>
+		</table>
+		
+		<form method="post" name="flist">
+		<input type="hidden" name="type_v" value="[%type%]">
+        <input type="hidden" name="action" value="">
+        <input type="hidden" name="folder" value="[%folder%]">
+        <div style="display: none;"><input type="checkbox" name="file_name" value=""></div>
+		[%IF type==1%]
+		<table>
+		    
+		    <tr>
+		        <td></td>
+		        <td><input type="checkbox" onclick="CheckAll(this, document.forms['flist'].elements['file_name'])"></td>
+		        <td></td>
+		        <td>
+		        [%IF folder%]
+		        <a href="?[%IF type>1%]type_v=[%type%]&[%END%][%IF folder_up%]folder=[%folder_up%][%END%]">..</a>
+		        [%END%]
+		        </td>
+		    </tr>	
+		    
+		    [%FOREACH d = dirs%]
+		    <tr>
+		        <td>
+		        	<a href="?[%IF type>1%]type_v=[%type%]&[%END%][%IF folder%]folder=[%folder%]&[%END%]action=delete&file_name=[%d.name%]" onclick="if(!confirm('Удалить'))return false;">
+		        	<img src="images/4.gif" border="0" title="Удалить"></a>
+		        </td>
+		        <td><input name="file_name" value="[%d.name%]" type="checkbox"></td>
+		        <td><img src="icons/folder.png" width="22"></td>
+		        <td><a href="?[%IF type>1%]type_v=[%type%]&[%END%]folder=[%IF folder%][%folder%]/[%END%][%d.name%]">[%d.name%]</a></td>
+		    </tr>
+		    [%END%]
+		    [%FOREACH fname = files%]
+		    <tr>
+		        <td>
+		        	<a href="?[%IF type>1%]type_v=[%type%]&[%END%][%IF folder%]folder=[%folder%]&[%END%]action=delete&file_name=[%fname.name%]" onclick="if(!confirm('Удалить'))return false;">
+		        	<img src="images/4.gif" border="0" title="Удалить"></a>
+		        </td>
+		        <td><input name="file_name" value="[%fname.name%]" type="checkbox"></td>
+		        <td><img src="[%fname.ico%]" width="22"></td>
+		        <td><a href="javascript: void(0);" onclick="alert('[%path_www%]/[%fname.name%]');">[%fname.name%]</a></td>
+		    </tr>
+		    [%END%]
+		</table>
+		[%ELSIF type==2%]
+			[%IF folder%]
+			<div style="float: left; width: 120px; height: 157px; border: 1px solid black; margin: 2px;" align="centet">
+				<h1 align="center"><a href="?[%IF type>1%]type_v=[%type%]&[%END%][%IF folder_up%]folder=[%folder_up%][%END%]">..</a></h1>
+				<br><br>
+			</div>
+			[%END%]
+			[%FOREACH d = dirs%]
+			<div style="float: left; border: 1px solid black; margin: 2px;">
+				<img src="icons/folder.png" width="120"><br>
+				<div align="center">
+					<a href="?[%IF type>1%]type_v=[%type%]&[%END%][%IF folder%]folder=[%folder%]&[%END%]action=delete&file_name=[%d.name%]" onclick="if(!confirm('Удалить'))return false;">
+						<img src="images/4.gif" border="0" title="Удалить"></a>
+					<input name="file_name" value="[%d.name%]" type="checkbox"><br>
+					<a href="?[%IF type>1%]type_v=[%type%]&[%END%]folder=[%IF folder%][%folder%]/[%END%][%d.name%]">
+					[%d.name%]
+					</a>
+				</div>
+			</div>
+			[%END%]
+			[%FOREACH fname = files%]
+			<div style="float: left; border: 1px solid black; margin: 2px;" title="[%fname.name%]">
+				<img src="[%IF fname.type_img%][%path_www%]/[%fname.name%][%ELSE%][%fname.ico%][%END%]" width="120" height="120" onclick="alert('[%path_www%]/[%fname.name%]');"><br>
+				<div align="center">
+					<a href="?[%IF type>1%]type_v=[%type%]&[%END%][%IF folder%]folder=[%folder%]&[%END%]action=delete&file_name=[%fname.name%]" onclick="if(!confirm('Удалить'))return false;">
+						<img src="images/4.gif" border="0" title="Удалить"></a>
+					<input name="file_name" value="[%fname.name%]" type="checkbox"><br>
+					[%fname.name_small%]
+				</div>
+			</div>
+			[%END%]
+		[%END%]
+		</form>	
+	[%END%]
+	</div>
+
+	</body>
+</html>

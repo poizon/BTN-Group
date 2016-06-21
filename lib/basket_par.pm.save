@@ -1,0 +1,240 @@
+a‰-a‰/a‰/a‰0 ~1#~1package basket_par;
+use CGI::Fast qw(:standard);
+use CGI::Cookie;
+use CGI::Carp qw/fatalsToBrowser/;
+use Data::Dumper;
+use DBI;
+#use cms_struct;
+BEGIN {
+		use Exporter ();
+		@ISA = "Exporter";
+		@EXPORT = 
+		(
+			'&add_to_basket', '&clean_basket','$params','&processing_basket', '&init_basket',
+			'&basket_info','&basket_full_info'
+		);
+}
+# параметры из основного модуля
+our $params;
+
+sub processing_basket{	
+	my $action=param('action');
+	my $cookie_name=param('basket');
+	$cookie_name='basket' unless($cookie_name);	
+	my $attr=undef;
+	
+	foreach my $attr_name (@{$::params->{basket}->{$cookie_name}->{attr_list}}){
+		#print "$attr_name: ".param('attr_'.$attr_name).'<br>';
+		$attr->{$attr_name}=param('attr_'.$attr_name);
+	}
+	#&::print_header;
+	if($action eq 'add'){ # добавление товара в корзину
+		my $rec=param('rec');
+		my $count=param('cnt');
+		# опции с атрибутами
+
+=cut
+		# атрибуты собираем в виде:
+		[
+			{
+				name=>'..',
+				value=>'..'
+			}
+		]
+=cut
+		#print "Content-type: text/html\n\nattr:".Dumper($attr)."<br>";exit;
+		if($rec=~m/^\d+$/ && $count=~m/^\d+$/){
+			#print "add<br/>";
+			&add_to_basket(
+			{
+			  record_id=>$rec,
+			  count=>$count,
+			  cookie_name=>$cookie_name,
+			  attr=>$attr # передаём список атрибутов и значений для добавляемого товара
+			});
+		}
+	}
+	elsif($action eq 'clean'){
+		&clean_basket($cookie_name);
+		return;
+	}
+	elsif($action eq 'del'){ # удаление из корзины товарной позиции
+			#print "action: del"; exit;
+			my $rec=param('rec');
+			my $count=param('cnt');
+			&del_from_basket(
+			{
+			  record_id=>$rec,
+			  count=>$count,
+			  cookie_name=>$cookie_name,
+			  attr=>$attr
+			});
+			$::params->{basket}->{basket}->{cur_record_count}=$count;
+			&basket_full_info({basket=>$params->{basket}->{basket}});
+	}
+	elsif($action eq 'basket_update'){
+		my @idlist=param('rec_id');
+		my @counts=param('cnt');
+		my @values=();
+		my @attr=(); # сюда собираем атрибуты
+		my $i=0;
+	#print "Content-type: text/html\n\n";
+	# $attr -- список возможных атрибутов
+	
+	foreach my $attr_name (keys(%{$attr})){
+		my @tmp=();
+		@tmp=param('attr_'.$attr_name);
+		my $i=0;
+		foreach my $v (@tmp){
+			if($attr[$i]){$attr[$i].=';;'}
+			$attr[$i].="$attr_name=$v";
+			$i++;
+		}
+	}
+	
+	#print '<pre>777'.Dumper(\@attr).'</pre>';exit;
+		$::params->{TMPL_VARS}->{basket}->{$cookie_name}->{total_count}=0;
+		$::params->{TMPL_VARS}->{basket}->{$cookie_name}->{total_price}=0;
+		
+		
+		foreach my $id (@idlist){
+			push @values, qq{$id;$counts[$i];$attr[$i]};
+			# увеличиваем кол-во товаров
+			$::params->{TMPL_VARS}->{basket}->{$cookie_name}->{total_count}+=$counts[$i];
+
+			# пересчитываем сумму, на кот. понабрали товаров:
+			my $price=get_price($cookie_name,$id);
+
+			$::params->{TMPL_VARS}->{basket}->{$cookie_name}->{total_price}+=$counts[$i]*$price;			
+			$i++;
+		}
+		
+		my $cookie=new CGI::Cookie(
+			-name=>$cookie_name,
+			-value=>[
+				@values
+			]
+		);		
+		print "Set-Cookie: $cookie\n";
+		undef(@values);		
+		#&::print_header;
+		#print "total_price: $::params->{TMPL_VARS}->{basket}->{$cookie_name}->{total_price}<br>";
+	}
+	#&basket_full_info();
+	
+	#print "action: $action";
+	
+}
+sub add_to_basket{
+=cut
+Добавление в корзину
+{
+	cookie_name=>[наименование куки, в кот. будут все товары], # по умолчанию basket
+	record_id=>[ид-шник записи]
+	count=>[кол-во]
+}
+=cut		
+	my $opt=shift;
+	$opt->{cookie_name}='basket' unless($opt->{cookie_name});
+	$opt->{count}=1 unless($opt->{count});
+
+	# получаем старое значение cookie и обновляем его
+	@values = cookie($opt->{cookie_name});
+	# собираем хеш атрибутов и их значений
+	
+	
+	my $exists=0;
+	my $i=0;
+	#print "Content-type: text/html\n\n";
+	#&::pre($::params->{TMPL_VARS}->{basket}->{basket});
+	foreach my $v (@values){ # если такой товар уже выбран ранее -- плюсуем кол-во
+		
+		if($v=~m/^(.+?);(\d+);(.+)?$/){
+			#print "attr_string: $attr_string<br>";
+			my ($rec_id,$count,$attr_string)=($1,$2,$3);
+			
+			# разными товарами считаются даже товары с одинаковыми id, атрибуты у которых различаются
+			my $attr_complete=1;
+			if($::params->{basket}->{$opt->{cookie_name}}->{attr_list}){
+				while($attr_string=~m/([^;]+?)=([^;]+?)/g){
+					my ($attr_name,$attr_value)=($1,$2); # -- имя атрибута и значения для товара из корзины
+					
+					foreach my $name (@{$::params->{basket}->{$opt->{cookie_name}}->{attr_list}}){ # погнали по всем атрибутам
+						if(($name eq $attr_name) && ($attr_value ne $opt->{attr}->{$name})){
+						# если атрибуты одинаковые, но их значения разные, значи товары разные
+							$attr_complete=0 
+						}
+					}
+				}
+			}
+			# attr -- атрибут конкретного товара в виде: [атрибут]=значение;[атрибут]=значение;....
+			
+			if($attr_complete && $rec_id==$opt->{record_id}){
+				$values[$i]=qq{$rec_id;}.($count+$opt->{count}).qq{;$attr_string};
+				$exists=1;
+				$::params->{TMPL_VARS}->{basket}->{basket}->{cur_record_count}=($count+$opt->{count});			
+				last;
+			}
+		}		
+		$i++;
+	}
+	#pre($::params->{TMPL_VARS}->{basket}->{cur_record_count});
+	#&::pre($opt);
+	$params->{TMPL_VARS}->{basket}->{$opt->{cookie_name}}->{total_count}+=$opt->{count};
+	#$params->{TMPL_VARS}->{basket}->{$opt->{cookie_name}}->{total_price}+=(&get_price($opt->{cookie_name},$opt->{record_id})*$opt->{count});
+	#&::pre($::params->{TMPL_VARS}->{basket}->{basket});
+	unless($exists){ # такого товара в корзине нет, добавляем в список
+		# формирование строки атрибутов в виде "имя=значение&имя=значение&..."
+		my $attr_string='';
+		# перебираем список атрибутов, объявленных при инициализации
+		
+		#print '<pre>'.Dumper($opt->{attr}).'</pre>';
+		foreach my $attr_name (@{$::params->{basket}->{$opt->{cookie_name}}->{attr_list}}){
+			if($attr_string){$attr_string.=';;'}
+			$attr_string.=$attr_name.'='.$opt->{attr}->{$attr_name}
+		}
+		
+		
+		push @values,qq{$opt->{record_id};$opt->{count};$attr_string};
+
+		
+	}
+
+	# увеличиваем кол-во товаров
+	#$::params->{TMPL_VARS}->{basket}->{$opt->{cookie_name}}->{total_count}+=$opt->{count};
+	
+	# добавляем к цене
+	my $price=$::params->{TMPL_VARS}->{basket}->{cur_record_price}=get_price($opt->{cookie_name},$opt->{record_id});
+	$::params->{TMPL_VARS}->{basket}->{cur_record_total_price}=$::params->{TMPL_VARS}->{basket}->{cur_record_count}*$price;
+	
+	$::params->{TMPL_VARS}->{basket}->{$opt->{cookie_name}}->{total_price}+=$price*$opt->{count};
+	#&pre($::params->{TMPL_VARS}->{basket});
+	
+# Значения в виде:
+# ["$rec_id;$count", "$rec_id;$count", "$rec_id;$count",...]	
+	my $cookie=new CGI::Cookie(
+			-name=>$opt->{cookie_name},
+			-value=>[
+				@values
+			]
+	);
+	print "Set-Cookie: $cookie\n";
+	undef(@values);
+	
+	#print "$opt->{cookie_name}<br/>".Dumper($::params->{TMPL_VARS}->{basket});
+}
+sub del_from_basket{
+	my $opt=shift;
+	$opt->{cookie_name}='basket' unless($opt->{cookie_name});
+	@old = cookie($opt->{cookie_name});
+	@values=();
+	my $i=0;
+	#&::print_header;	
+	$::params->{TMPL_VARS}->{basket}->{$opt->{cookie_name}}->{total_count}=0;
+	$::params->{TMPL_VARS}->{basket}->{$opt->{cookie_name}}->{total_price}=0;
+	foreach my $v (@old){
+		my $exitsts=0;
+		
+		if($v=~m/^(.+?);(\d+);(.+)?$/){
+			my ($rec_id,$count,$attr_string)=($1,$2,$3);
+			my $attr_complete=1;

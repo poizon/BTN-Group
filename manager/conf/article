@@ -1,0 +1,46 @@
+our %form=(
+	title => 'Статьи',
+	work_table => 'article',
+	work_table_id => 'article_id',
+	make_delete => '1',
+	default_find_filter => 'header',
+	read_only => '0',
+	tree_use => '0',
+	events=>{
+		before_insert=>sub{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		},
+		permissions=>q{
+			# Уникальные УРЛ'ы
+			&{$form->{PLUGINIT}->{ex_links}}('/article/[%id%]') if($form{project}->{options}->{ex_links});
+		}
+	},	
+	fields =>
+	[
+		{
+			name => 'header',
+			description => 'Заголовок статьи',
+			type => 'text',
+		},
+		{
+			name => 'anons',
+			description => 'Анонс',
+			type => 'textarea',
+		},
+		{
+			name => 'body',
+			description => 'текст статьи',
+			type => 'wysiwyg',
+		},
+		{
+			description=>'Дата создания',
+			name=>'registered',
+			type=>'datetime',
+			default_value=>'now()'
+		}
+	]
+);

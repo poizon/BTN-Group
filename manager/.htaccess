@@ -1,0 +1,23 @@
+DirectoryIndex index.pl
+AuthUserFile /dev/null
+AuthBasicAuthoritative Off
+Require valid-user
+AuthName "Auth"
+AuthType Basic
+Auth_MySQL On
+
+Auth_MySQL_Encrypted_Passwords on
+#Auth_MySQL_Encryption_Types Plaintext #Crypt_DES MySQL PHP_MD5
+Auth_MySQL_Encryption_Types Crypt_DES MySQL PHP_MD5
+Auth_MySQL_CharacterSet cp1251
+Auth_MySQL_Host 192.168.8.81
+Auth_MySQL_DB svcms
+Auth_MySQL_User svcms
+
+
+Auth_MySQL_Password_Table manager
+Auth_MySQL_Username_Field login
+Auth_MySQL_Password_Field password
+
+ErrorDocument 401 "<html><meta http-equiv=\"refresh\" content=\"0;url=/\"></html>"
+

@@ -1,0 +1,12 @@
+#/root/bin/svcms_gen_sites.sh
+RewriteEngine on
+DirectoryIndex work.fcgi index.html
+RewriteBase    /
+RewriteRule viewimage/(.*) view_image.pl/$1 [L]
+RewriteCond %{HTTP_HOST} (www\.)?b2b-connect\.ru
+RewriteRule ^certificats/\.cer$ files/project_2/B2B_connect.cer [L]
+RewriteRule ^certificats/\.crl$ files/project_2/5cde5a58f6bbec7206e6589840f4eeffae98f4e4.crl [L]
+RewriteRule ^certificats/(.*)$ files/project_2/certificats/$1 [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule (.*) work.fcgi/$1 [L]

@@ -1,0 +1,31 @@
+[% import(content) %]
+        <!--// content //-->
+        <section class="content">
+            [% layout.path_info %]
+            <div class="h1">[% h1 ? h1 : header %]</div>
+            [% body IF !page || page == 1 %]
+            <ul class="list ibs catalog_list_3">
+              [% FOREACH LIST %]
+                <li class="item">
+                    <p class="title"><a class="link" href="[% url %]">
+                      [% IF photo %]
+                        <span class="fig"><img class="img" src="[% photo_and_path_mini1 %]" alt=""/></span>
+                      [% END %]
+                      <span class="text">[% header %]</span>
+                    </a></p>
+                    <ul class="list">
+                        <li class="item">Артикул: [% artikul || '-' %]</li>
+                        <li class="item">Размеры: [% sizes || '-' %]</li>
+                        <li class="item">Цвет: [% colors || '-' %]</li>
+                    </ul>
+                    [% anons %]
+                    <p>
+                      <span class="fr pt-4"><a class="btn_1 js-show_modal" onclick="$('#modal_send_request_message').val('[% header | htmlit %]')" href="#modal_send_request">Отправить заявку</a></span> 
+                      [% to_p(val=price,tag='span') %]
+                    </p>
+                </li>
+              [% END %]
+            </ul>
+            [% layout.paging %]
+        </section>
+        <!--// end content //-->

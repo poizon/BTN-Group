@@ -1,0 +1,32 @@
+#ѕробна€ верси€ много€зычности
+$form->{PLUGINIT}->{multilang}=sub{
+	my ($lang,$langs)=@_;
+	#lang - €зык по умолчанию
+	#langs - €зыки
+	unless($lang){print 'error'; return;}
+	if($ENV{SCRIPT_NAME}=~m/admin_table\.pl$/ || $ENV{SCRIPT_NAME}=~m/find_objects\.pl$/){
+	}
+	elsif($ENV{SCRIPT_NAME}=~m/\/edit_form\.pl$/){
+		if(param('loid')){
+			my $lang_owner_id={
+				name=>'lang_owner_id',
+				type=>'hidden',
+				value=>param('loid'),
+			};
+			@{$form->{fields}}=($lang_owner_id,@{$form->{fields}});
+		}
+		my $lang_fld={
+			name=>'lang',description=>'язык',type=>'select_values',values=>$langs,
+		};
+		@{$form->{fields}}=($lang_fld,@{$form->{fields}});
+		my $t={
+			description=>'языковые версии',
+			type=>'code',
+			code=>sub{return qq{}},
+		};
+		@{$form->{fields}}=($t,@{$form->{fields}});
+		
+			
+	}
+	elsif($ENV{SCRIPT_NAME}=~m/\/delete_element\.pl$/){}
+}

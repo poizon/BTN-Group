@@ -1,0 +1,44 @@
+#Khabusev Phanis [pmk@trade.su] 3.04.2012+
+#old managers
+#in structure need add plugins=>['find::export_xls']
+
+$form->{not_perpage}=1;
+
+if($form->{project}{options}{use_external_promo_exporter}){
+$plugin={
+	description=>'Ёкспортировать в XLS',
+	icon=>q{/manager/plugins/find/icon_xls.jpg},
+	code_out=>q{			
+		use Spreadsheet::WriteExcel;
+		use Encode qw(decode);
+		use Data::Dumper;
+
+		my $filepath	= "../files/project_$form->{project}->{project_id}/tmp_export_xls";
+		unless ( -d $filepath){
+			mkdir $filepath; 
+			chmod 0777, $filepath;
+		}
+		my $filename	= 'promo.xls';
+
+		my $workbook	= Spreadsheet::WriteExcel->new("$filepath/$filename");
+		my $worksheet	= $workbook->add_worksheet(decode('cp1251','лист1'));
+		my $f		= $workbook->add_format(bottom=>1, border_color=>8,);
+
+		my $col = 1;
+
+		$worksheet->write("A$col",[map{decode('cp1251',$_)} @{$form->{RESULT_HEADERS}}], $f);
+		foreach my $tr (@{$form->{RESULT}})
+		{
+			my $id = pop @{$tr};
+			$col++;
+			$worksheet->write("A$col",[map{decode('cp1251',$_)} @{$tr}], $f);
+		}
+
+		$workbook->close();
+		print qq{<a href="$filepath/$filename"><span style='color: green; font-size: 12pt;'>—качать excel-файл.</span></a>};
+		
+	}
+}
+};
+#Khabusev Phanis [pmk@trade.su] 3.04.2012-
+

@@ -1,0 +1,21 @@
+<head>
+<title>[% page_title ? page_title : promo.title _ ( const.companyname ? ' - ' _ const.companyname : undef ) ; maxpage> 1 && page> 1 ? ' - страница ' _ page : undef %]</title>
+<meta name="Description" content="[%promo.description|html%]" />
+<meta name="Keywords" content="[%promo.keywords|html%]" />
+[%promo.add_tags%]
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta charset="windows-1251"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href='[%TEMPLATE_FOLDER%]/css/styles.css' rel="stylesheet"/>
+    <script src='[%TEMPLATE_FOLDER%]/js/modernizr-2.7.1.js'></script>
+    <!--[if lte IE 8]><script src='[%TEMPLATE_FOLDER%]/js/jquery-1.11.2.min.js'></script><![endif]-->
+    <!--[if gte IE 9]><!--><script src='[%TEMPLATE_FOLDER%]/js/jquery-2.1.3.min.js'></script><!--<![endif]-->
+    <script src='[%TEMPLATE_FOLDER%]/js/jmodal.js'></script>
+    <script src='[%TEMPLATE_FOLDER%]/js/jvalidate.js'></script>
+    [% IF page_type == 'catalog/catalog_detali' %]
+      <script src="[% TEMPLATE_FOLDER %]/js/jquery.jqzoom-core-pack.js"></script>
+    [% END %]
+    <script src='[%TEMPLATE_FOLDER%]/js/jinit.js'></script>
+  <script src='/js/ajax.js'></script>
+</head>
+

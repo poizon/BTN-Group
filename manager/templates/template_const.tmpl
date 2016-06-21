@@ -1,0 +1,44 @@
+<html>
+	<head>
+		<title>Редактирование констант</title>
+		<style>
+			body {margin: 20px;}
+			table {border-collapse: collapse;}
+			td.{font-weight: bold;}
+			td{
+				font-size: 10pt;
+				font-family: arial;
+				border: none;
+				padding: 2px 4px;
+			}
+			.sbm {
+				text-align: center;
+				padding-top: 10px;
+			}
+			.desc {font-weight: normal;}
+			textarea {width: 700px; height: 200px;}
+			.inp {width: 700; border: 1px solid gray;}
+		</style>
+	</head>
+	<body>
+	<h2>Редактирование констант</h2>
+	<form method="post" enctype="multipart/form-data">
+	<input type="hidden" name="action" value="update">
+	<table>
+		<tr>
+			<td></td>
+			<td></td>
+		</tr>	
+		[%FOREACH f IN FIELDS%]
+		<tr>
+			<td class="desc">[%f.description%]:</td>
+			<td>[%f.field%]</td>
+		</tr>
+		[%END%]
+		<tr>
+			<td colspan="2" class="sbm"><input type="submit" value="Обновить"></td>
+		</tr>
+	</table>
+	</form>
+	</body>
+</html>

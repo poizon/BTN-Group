@@ -1,0 +1,15 @@
+<html>
+	<head>
+		<title>Быстрая загрузка фото</title>
+	</head>
+	<body>
+		<p>
+			<select name="" onchange="">
+				[%list = rublist%]			
+				[%FOREACH r IN rublist%]
+				<option value="[%r.id%]">[%r.header%]</option>
+				[%END%]
+				</select>
+		</p>
+	</body>
+</html>

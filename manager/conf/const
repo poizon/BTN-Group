@@ -1,0 +1,51 @@
+our %form=(
+config => 'const',
+db_engine => 'InnoDB',
+title => 'Константы',
+work_table => 'const',
+work_table_id => 'const_id',
+make_delete => '0',
+default_find_filter => 'name',
+read_only => '0',
+tree_use => '0',
+add_where=> 'project_id=$form->{project}->{project_id}',	
+events=>{
+		before_insert=>sub{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+			my $url=param('url');
+			my $sth=$form->{dbh}->prepare("SELECT count(*) from $form->{work_table} where project_id=? and name=?");
+			$sth->execute($form->{project}->{project_id},$url);
+			$form->{errors}=qq{Для данного проекта уже существует запись с именем $name} if($sth->fetchrow());
+		},
+		permissions=>q{
+			if($form->{id}){				
+				my $sth=$form->{dbh}->prepare("SELECT read_only from $form->{work_table} WHERE $form->{work_table_id}=$form->{id}");
+				$sth->execute();
+				$form->{read_only}=$sth->fetchrow();
+			}
+		}
+},
+fields =>
+[
+	{
+		name => 'name',
+		db_type => 'varchar(50) not null default \'\'',
+		description => 'имя константы',
+		type => 'text',
+		regexp => '^[0-9a-zA-Z\_]+$',
+		add_description => 'только латинские буквы и цифры',
+		#read_only=>1
+	},
+	{
+		name => 'value',
+		db_type => 'text not null default \'\'',
+		description => 'Значение',
+		type => 'textarea',
+		add_description => 'только латинские буквы и цифры',
+	},
+]
+);

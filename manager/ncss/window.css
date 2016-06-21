@@ -1,0 +1,126 @@
+/*---------------------- basic styles ---------------------------------*/ 
+@import url("base.css");
+/*---------------------- end basic styles ------------------------------*/
+/*---------------------- global --------------------------------------*/
+html { overflow-y: scroll; -webkit-tap-highlight-color: rgba(0,0,0,0); -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+body { background:#f0f0f0; color:#333; font-size:.75em/*12px*/;  line-height:1.4; }
+input, button, select, label, textarea, body { font-family:Arial, Helvetica, sans-serif; }
+body, html { height:100%; }
+a { color:#278ac5; }
+a:visited { }
+a:hover, .n-u a { text-decoration:none; }
+a:focus { }
+a:active { }
+a.dash, .dash a { text-decoration:none; border-bottom:1px dashed; }
+a.dash:hover, .dash a:hover { border:0; }
+:focus { outline: none; }
+/*---------------------- global --------------------------------------*/
+/*colors*/
+.blue { color:#0074b2; }
+ul.list1 a { color:#333; }
+.red { color:#e63838; }
+.welcome, .welcome a { color:#c7e4f5; }
+.footer, .footer a { color:#c9d9e6; }
+ul.l-bar a, ul.list3 a, ul.l-bar2 a { color:#43a2db; }
+ul.l-bar a:hover, ul.list3 a:hover, ul.l-bar2 a:hover { color:#1b5d96; }
+.h2 { color:#333333;
+font-weight: bold;
+padding:10px 0 15px 5px;
+font-family:'HeliosCondRegular', Arial, Helvetica, sans-serif;
+font-size:2.1666em/*26px*/;
+ }
+.error-text{ color:#f00; }
+/*end colors*/
+/*other*/
+hr { border:0; margin:0 0 10px; height:0; display:block; width:100%; vertical-align:top; overflow:hidden; border-top:1px dotted #bdbdbd; }
+.hr{ border-top:1px dotted #cbcbcb; margin-bottom:12px; margin-top:12px; }
+/*end other*/
+
+.rn-wt{ overflow:hidden; display:block; }
+.rn-wt{ background:#fff; -webkit-border-radius:6px; -moz-border-radius:6px; border-radius:6px; position:relative; padding:10px; border:1px solid #e1e1e1; }
+.rn-wt{ padding:22px 10px; }
+
+.btn1 {
+border:0; background:none; padding:0!important;
+text-align: left; 
+font-size:1.3333em/*16px*/;
+font-weight: bold;
+}
+input[type="text"], input[type="password"], select, textarea { padding:3px; }
+
+
+/*fonts*/
+@font-face {
+    font-family: 'HeliosCondRegular';
+    src: url('../f/helioscond-webfont.eot');
+    src: url('../f/helioscond-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../f/helioscond-webfont.woff') format('woff'),
+         url('../f/helioscond-webfont.ttf') format('truetype'),
+         url('../f/helioscond-webfont.svg#HeliosCondRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+.footer, .h2, ul.list3 { font-family:"Myriad Pro", Arial, Helvetica, sans-serif; }
+.h3 { font-family:'Arial Narrow', Arial, Helvetica, sans-serif; }
+ul.list3 ul.s { font-family:Arial, Helvetica, sans-serif; }
+.tabs { font-family:Tahoma, Geneva, sans-serif; }
+.f-10 { font-size:.8333em/*10px*/; }
+.f-11, .tabs, .error-text, ul.list-option .item { font-size:.9166em/*11px*/; }
+.f-12, ul.ib-ju>li, ul.ib-li>li, .ib-ju .ib { font-size:1em/*12px*/; }
+.f-13, ul.list1, ul.l-bar, ul.l-bar2 { font-size:1.0833em/*13px*/; }
+.f-14 { font-size:1.1666em/*14px*/; }
+.f-15 { font-size:1.25em/*15px*/; }
+.f-16, ul.list3, .h4 { font-size:1.3333em/*16px*/; }
+.f-17 { font-size:1.4166em/*17px*/; }
+.f-18 { font-size:1.5em/*18px*/; }
+.f-20, .h3 { font-size:1.6666em/*20px*/; }
+/*end fonts*/
+
+.window {
+padding:10px 0 15px 15px;
+ }
+ 
+ .comment {font-size:1em/*12px*/; font-style:italic; color:#717171; }
+
+td {vertical-align: top; padding: 2px 4px 2px 4px; }
+			td.description {font-weight: bold; vertical-align: middle}
+			td.description small{font-weight: normal;}
+			#errors {color: red;}
+			select.input, .input {width: 700px; font-size: 10pt; }
+			textarea {width: 700px; height: 100px;}
+			textarea.mce {width: 700px; height: 300px;}
+			tr.label {height: 30px}
+			tr.label td {
+				background: #222277; color: #ffffff; text-align: center;
+				font-weight: bold;
+				vertical-align: middle;				
+			}
+
+			h1{
+				color: 0000aa;
+				font-size: 18pt;
+			}
+
+			img {border: none;}
+			div.tree div {padding-left: 20px;}
+
+			.description{
+				font-weight: bold;
+				padding-right: 10px;
+			}
+			
+			table.mform td {font-size: 8pt; }
+			
+			/*--------------------------- end form ----------------------------*/
+input[type=text], input[type=password], textarea { padding:3px 8px; background:#ffffff; border:1px solid #d6d6d6; -moz-border-radius:4px; -webkit-border-radius:4px; border-radius:4px; }
+.error-field{ border-color:#f00!important; }
+button { padding:2px 5px; margin:0; line-height:1; }
+* + html button { padding:0 5px 2px; }
+select { line-height:1; }
+/*webkit*/@media screen and (-webkit-min-device-pixel-ratio:0) {
+body:first-of-type button { padding:2px 5px 4px; }
+}
+
+/*--------------------------- end form ----------------------------*/
+#registered_outdays_calendar { z-index: 1}

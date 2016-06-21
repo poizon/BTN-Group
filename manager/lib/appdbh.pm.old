@@ -1,0 +1,12 @@
+package appdbh;
+use strict;
+use warnings;
+
+use DBI;
+
+sub new {
+	my $self = shift;
+	return DBI->connect('dbi:mysql:svcms:192.168.8.81','svcms','',{RaiseError=>1}) || die($!);
+}
+
+1;

@@ -1,0 +1,10 @@
+[% import(content) %]
+        <!--// content //-->
+        <section class="content">
+            [% layout.path_info %]
+          <div class="h1">[% h1 ? h1 : header %]</div>          
+            [% body %]
+            <p class="cb mb-34"><a class="back" onclick="history.back()">назад</a></p>
+            [% layout.promo %]
+        </section>
+        <!--// end content //-->

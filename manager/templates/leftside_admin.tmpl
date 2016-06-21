@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1251" />
+<meta http-equiv="description" content="" />
+<meta http-equiv="keywords" content="" />
+<title>Untitled Document</title>
+<link href="css/style.css" rel="stylesheet" type="text/css" media="screen, projection" />
+<!--// Незабываем прописывать и здесь путь к файлам и в файле ie.css  //-->
+<!--[if lte IE 8]>
+<link href="css/ie.css" rel="stylesheet" type="text/css" media="screen, projection" />
+<script type="text/jscript" src="javascript/ie.pack.js"></script>
+<![endif]-->
+
+<style>
+span.empty { padding-left: 16px; }
+span.p-r { padding-right: 8px; }
+span.p-l { padding-right: 8px; }
+ul.list9 li { list-style: none !important; list-style-image: none !important; }
+</style>
+
+
+</head>
+<body>
+<div class="wrapper">
+	<div class="header">
+		<div class="logo"><a href="http://www.designb2b.ru" target='_blank'>designb2b</a></div>
+	</div>
+	
+	[%# USE Dumper %][%# Dumper.dump_html(ADDONS) %]
+	
+	
+					<div class="head">Функционал</div>
+					[% IF STANDART.size() %]
+						<ul class="spec list9">
+							[% FOREACH i IN STANDART %]
+								<li><a href="[% i.link %]" target="main">[% i.header %]</a></li>
+							[% END %]
+						</ul>
+					[% END %]
+					
+						<div class="head">Разделы и сервисы</div>
+						<!-- test -->	
+						<!-- [% project %] -->	
+					[% IF ADDONS.size() %]
+						<ul  class="spec list9">
+							[% FOREACH i IN ADDONS %]
+								[% z = i.struct_type %]
+								[% c = i.struct_icon_id %]
+									[% IF i.struct_type!=0 %]
+							<li><span class="p-r[% IF !GROUPS.$z.photo %] empty[% END %]">[% IF GROUPS.$z.photo %]<img src="[% GROUPS.$z.photo_and_path %]" />[% END %]</span><a href="./[% i.admin_script %]?config=[% i.struct_id %]" target="main">[% i.header %]</a>
+									[% ELSE %]
+							<li><span class="p-r[% IF !ICONS.$c.photo %] empty[% END %]">[% IF ICONS.$c.photo %]<img src="[% ICONS.$c.photo_and_path %]" />[% END %]</span><a href="./[% i.admin_script %]?config=[% i.struct_id %]" target="main">[% i.header %]</a>
+									[% END %]
+
+							[% IF i.admin_script == 'admin_tree.pl' %]
+							<br><i><span class="f-10 gray pl-30"><a href="./admin_tree_move.pl?config=[% i.struct_id %]" target="main">(перемещение)</a></span></i></br>
+							[% END %]
+							</li>
+							[% END %]
+						</ul>
+					[% END %]
+	<div class="undfoot"></div>
+	<div class="footer"></div>
+</div>
+</body>
+</html>

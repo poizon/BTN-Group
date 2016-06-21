@@ -1,0 +1,224 @@
+use Lingua::Translit;
+use Data::Dumper;
+# оригинальные URL'ы для сущностей
+$form->{PLUGINIT}->{ex_links2}=sub{ 
+	#print "777";
+	my($in,$p1,$p2,$p3,$p4)=@_;
+	# in - осталось также
+	# p1 - вид ссылки
+	# p2 - поле для id ссылки
+# 	print "Content-Type: text/html\n\n";
+#	print $in;
+#	print $p1;
+	unless($in){
+		 print 'Не указан внутренний URL при запуске модуля ex_links';
+		 return;		 
+	}
+	$ext_url='pligin_ex_links_url';
+	if($ENV{SCRIPT_NAME}=~m/admin_table\.pl$/ || $ENV{SCRIPT_NAME}=~m/find_objects\.pl$/){ 
+		# ФИЛЬТРЫ
+		# 
+		my $in_flt=$in;		
+		
+		$in_flt=~s/\[%id%\]//;
+		if($p4 eq '1'){
+			my $pp2 = param($p2);
+			$in_flt=~ s/\[%$p2%\]/$pp2/g;
+		}
+		$project_id = $form->{dbh}->selectrow_array("SELECT project_id FROM struct WHERE struct_id = ?",undef,param('config'));
+		
+		@{$form->{fields}}=(
+		{
+				description=>'Оригинальный URL',
+				type=>'filter_extend_text',
+				name=>'ex_links',
+				filter_table=>'in_ext_url', 
+				db_name=>'ext_url',
+#				debug=>1,
+				extend_where=>qq{in_ext_url.in_url = concat('$in_flt',wt.$form->{work_table_id})},
+#				extend_where=>'in_ext_url.in_url = concat("'.$in_flt.'",wt.'.$form->{work_table_id}.') AND in_ext_url.project_id = '.$project_id,
+#				extend_where=>qq{in_ext_url.in_url = concat('$in_flt',wt.$form->{work_table_id}) AND in_ext_url.project_id = $project_id},
+				left_join=>1
+			},
+			@{$form->{fields}}
+		)
+	}
+	elsif($ENV{SCRIPT_NAME}=~m/\/edit_form\.pl$/){ 
+		#print "777";
+		my $val;
+		if($form->{id}){
+			$in=~s/\[%id%\]/$form->{id}/g;			
+			if($p4 eq '1'){
+				my $pp2=param($p2);
+				$in =~ s/\[%$p2%\]/$pp2/g;
+ 			}
+			my $sth=$form->{dbh}->prepare("SELECT ext_url FROM in_ext_url WHERE project_id=? and in_url=?");
+			$sth->execute($form->{project}->{project_id},$in);
+			$val=$sth->fetchrow();
+		}
+		
+		my $field={
+			description=>'Оригинальный URL',
+			add_description=>'например /novosti/politika/raspil/nadoel',
+			type=>'code',
+			code=>sub{return qq{<input type="text" class="input" value="$val" name="pligin_ex_links_url">}},
+			name=>'ex_links'
+		};
+		@{$form->{fields}}=($field,@{$form->{fields}});
+
+# ========================================		
+# ФУНКЦИЯ МОДИФИЦИРОВАНИЯ URL'а
+# ========================================
+		my $after_modified=sub{
+			
+			$in=~s/\[%id%\]/$form->{id}/g;
+			if($p4 eq '1'){
+				my $pp2 = param($p2);
+				$in =~ s/\[%$p2%\]/$pp2/g;
+			}
+			my $ext=param('pligin_ex_links_url');			
+			
+			if($ext){	# Если указан уникальный URL
+#				$d = $form->{dbh}->trace($form->{dbh}->parse_trace_flags('SQL|1|test'));
+#				my $d;
+#				$form->{dbh}->trace(2,'/home/isavnin/log/ex_trace.log');
+				my $sth = $form->{dbh}->selectrow_hashref(
+					"SELECT count(*) as rows FROM in_ext_url WHERE project_id=? AND ext_url=? AND in_url <> ?",
+					undef,
+					($form->{project}{project_id},$ext,$in)
+				);
+				
+#				$sql="SELECT count(*) as rows FROM in_ext_url WHERE project_id=4174 AND ext_url='$ext' AND in_url <> '$in'";
+				unless($sth->{rows}){
+					$form->{dbh}->do(
+						"REPLACE INTO in_ext_url(project_id,in_url,ext_url) VALUES(?,?,?)",
+						undef,
+						($form->{project}{project_id},$in,$ext)
+					);
+				}
+				else{ # ошибка 
+					$form->{errors}.=qq{<br/>Уникальный URL '$ext' для данного проекта уже существует $d };
+				}
+				
+			}
+			else{	
+				if((!param($p2)||param($p2) eq '')){			
+					my $sth=$form->{dbh}->prepare("DELETE FROM in_ext_url WHERE project_id=? and in_url=?");
+					$sth->execute($form->{project}{project_id},$in);
+					print "ttt";
+				}
+				elsif(param($p2)){
+					my $p1_ext=$p1;
+					$pp2 = param($p2);
+					$p1_ext =~ s/\[%$p2%\]/$pp2/;
+					$p1_ext =~ s/\[%header%\]//;
+
+					$flevel_pat = $p1_ext;
+					$flevel_pat =~ s/\/$//;
+					
+					$tr = new Lingua::Translit('GOST 7.79 RUS');
+					$h = Encode::decode('cp1251',param('header'));
+					my $text = $tr->translit($h);
+					
+					# Обрезаем до одного из вариантов скобок
+					$text =~ m/[\(|\)\[\]\{\}]/;
+					$t = $` ne $p1_ext && $` ne $flevel_pat ? $` : $text;
+					
+					# Обрезаем до 1 точки если длина больше 25
+					if(length($t) > 25){
+						$t =~ m/\./;
+						$t = $` ne $p1_ext && $` ne $flevel_pat ? $` : $t;
+					}
+
+					# Меняем пробелы на -
+					$t =~ s/ /-/g;
+					$t =~ s/[-]{2,}/-/g;
+					$t2 = $p1_ext.$t;
+					
+					# Удаляем все НЕ СИМВОЛЫ и НЕ ЦИФРЫ
+					$t =~ s/[^a-zA-Z0-9-]//g;
+					if(length($t) > 25){
+						# Разбиваем на части и склеиваем
+						@str = split('-',$t);
+						$t2=$p1_ext;
+						$s = 0;
+						foreach(@str){
+							$t2.= $s == 0 ? $_ : '-'.$_;
+							$s += length($_);
+							last if $s >= 25;
+						}
+					}
+					$tmp = $form->{dbh}->selectrow_hashref(
+						"SELECT count(*) as rows FROM in_ext_url WHERE project_id = ? AND ext_url = ?",
+						undef,
+						($form->{project}{project_id},$t2)
+					);
+					$url=lc($t2).($tmp->{rows} > 0 ? '-'.$tmp->{rows} : '');
+					$first_level_url = $form->{dbh}->selectrow_arrayref("SELECT ext_url FROM in_ext_url WHERE project_id = ? AND in_url = ?",undef,($form->{project}{project_id},$flevel_pat));
+					if($first_level_url->[0] ne ''){
+						$url1 = $url;
+						$url1 =~ s/$flevel_pat/$first_level_url->[0]/;
+						$url=$url1;
+					}
+					$tmp = $form->{dbh}->selectrow_hashref(
+						"SELECT count(*) as rows FROM in_ext_url WHERE project_id = ? AND ext_url = ?",
+						undef,
+						($form->{project}{project_id},$url)
+					);
+					$url=$url.'-'.$form->{id} if($tmp->{rows} > 0);
+					$url.='/' if($p3 eq 1);
+					$form->{dbh}->do("REPLACE INTO in_ext_url(project_id,in_url,ext_url) VALUES(?,?,?)",undef,($form->{project}{project_id},$in,$url));
+					$ext=$url;
+				}
+			}
+			
+			foreach my $f (@{$form->{fields}}){
+				if($f->{name} eq 'ex_links'){
+					$f->{code}=sub{return qq{<input type="text" value="$ext" name="pligin_ex_links_url">}};
+					last;
+				}
+			}
+		};		
+
+		
+		# модифицируем события
+		$form->{events}->{after_insert}=&add_code_to_event($form->{events}->{after_insert},\&$after_modified);		
+		$form->{events}->{after_update}=&add_code_to_event($form->{events}->{after_update},\&$after_modified);
+	}
+	elsif($ENV{SCRIPT_NAME}=~m/\/delete_element\.pl$/){
+	# ========================================
+# Функция очистки таблицы in_ext_url при удалении записи из work_table
+# ========================================
+		my $before_delete=q{
+#			$in=~s/\[%id%\]/$form->{id}/g;
+#			print "111";
+			
+			$url=$form->{events}{permissions};
+			$url =~ s/\/(\w+)\//$in=$+/e;
+#			print $url;
+			print $in;
+			if($in){
+				#$in='/'.$in.'/'.$form->{id};
+				$in =~ s/\[%id%\]/$form->{id};
+				if($p4 eq '1'){
+					my $pp2 = param($p2);
+					$in =~ s/\[%$p2%\]/$pp2;
+				}
+				my $sql="DELETE FROM in_ext_url WHERE project_id = ? AND in_url=?";
+				$form->{dbh}->do($sql,undef,($form->{project}{project_id},$in));
+#				my $sth=$form->{dbh}->prepare("DELETE FROM in_ext_url WHERE project_id=? and in_url='?'");
+	#			print "222";
+#				$sth->execute($form->{project}->{project_id},$in);			
+			}
+		};
+		
+		unless($form->{events}->{before_delete}){
+			$form->{events}->{before_delete}=$before_delete;
+		}
+		else{
+			$form->{events}->{before_delete}=&add_code_to_event($form->{events}->{before_delete},$before_delete);
+		}
+		
+	}
+}
+

@@ -1,0 +1,70 @@
+our %form=(
+	title => 'Товар',
+	work_table => 'good',
+	work_table_id => 'good_id',
+	make_delete => '1',
+	default_find_filter => 'header',
+	read_only => '0',
+	tree_use => '0',
+	events=>{
+		before_insert=>sub{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		},
+		permissions=>q{
+			# Уникальные УРЛ'ы
+			&{$form->{PLUGINIT}->{ex_links}}('/good/[%id%]') if($form{project}->{options}->{ex_links});
+		}
+	},
+	add_where=>qq{project_id = [%project_id%]},
+	fields =>
+	[
+		{
+			name=>'enabled',
+			description=>'Вкл / выкл',
+			type=>'checkbox'
+		},
+		{
+			name => 'header',
+			description => 'Наименование',
+			type => 'text',
+		},
+		{
+			name=>'anons',
+			description=>'Краткое описание',
+			type=>'textarea',
+			style=>'width: 500px; height: 200px'
+		},
+		{
+			name=>'body',
+			description=>'Описание товара',
+			type=>'wysiwyg'
+		},
+		{
+			name => 'rubricator_id',
+			description => 'Рубрикатор',
+			type => 'select_from_table',
+			table=>'rubricator',
+			header_field=>'header',
+			value_field=>'rubricator_id',
+			order=>'sort',
+			tree_use=>1,
+			where => q{project_id=[%project_id%]},
+		},
+#		{
+#			description=>'Связь с рубрикатором',
+#			name=>'relation',
+#			type=>'relation_tree',
+#			relation_table=>'rubricator',
+#			relation_table_header=>'header',
+#			relation_order=>'sort',
+#			relation_table_id=>'rubricator_id',
+#			relation_save_table=>'rubricator_good',
+#			relation_save_table_id_relation=>'rubricator_id',
+#			relation_save_table_id_worktable=>'good_id'
+#		}
+	]
+);

@@ -1,0 +1,21 @@
+.blur .modal__content {
+  opacity: 0;
+  -webkit-transform: translateY(-5%);
+  -ms-transform: translateY(-5%);
+  transform: translateY(-5%);
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+.blur.show .modal__content {
+  opacity: 1;
+  -webkit-transform: translateY(0px);
+  -ms-transform: translateY(0px);
+  transform: translateY(0px);
+}
+.modal_showen .wrapper {
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  -webkit-filter: blur(3px);
+  -ms-filter: blur(3px);
+  filter: blur(3px);
+}

@@ -1,0 +1,58 @@
+$form->{not_perpage}=1;
+$plugin={
+	description=>'Экспортировать в XLS',
+	icon=>q{/icon/ext-xls.gif},
+	code_out=>q{
+		use Spreadsheet::WriteExcel;
+		use Encode qw(decode);
+		use Data::Dumper;
+		use lib '../modules/';
+		use Mailer;
+        use Time::HiRes qw/ gettimeofday /;
+
+		my $filepath	= './crm_find_plugin/managers';
+		my $filename	= 'managers_' . join('',gettimeofday()) . '.xls';
+
+		my $workbook	= Spreadsheet::WriteExcel->new("$filepath/$filename");
+		my $worksheet	= $workbook->add_worksheet(decode('cp1251','лист1'));
+		my $f			= $workbook->add_format(bottom=>1, border_color=>8,);
+
+		my $col = 1;
+
+		$worksheet->write("A$col",[map{decode('cp1251',$_)} @{$form->{RESULT_HEADERS}}], $f);
+		foreach my $tr (@{$form->{RESULT}})
+		{
+			my $id = pop @{$tr};
+			$col++;
+			$worksheet->write("A$col",[map{decode('cp1251',$_)} @{$tr}], $f);
+		}
+
+		$workbook->close();
+
+		my $email = $form->{dbh}->selectrow_array('SELECT email FROM managers WHERE login = ?', undef, $ENV{REMOTE_USER});
+
+		if ($email =~ /@/)
+		{
+			Mailer::send_mail(
+				{
+					to_email	=> $email,
+					subj 		=> 'XLS менеджеры',
+					body 		=> 'XLS менеджеры',
+					filepath 	=> "$filepath/",
+					file     	=> $filename,
+					filename 	=> 'managers.xls',
+				}
+			);
+
+			print qq[<span style='color: green; font-size: 12pt;'>Отчёт отправлен Вам по почте.</span>];
+		}
+		else
+		{
+			print qq[<span style='color: red; font-size: 12pt; font-weight: bold;'>В модераторе не указан ваш почтовый адрес. Отправить отчёт невозможно!</span>];
+		}
+
+		`unlink "$filepath/$filename"`;
+	}
+};
+
+

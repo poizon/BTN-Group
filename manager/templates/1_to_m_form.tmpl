@@ -1,0 +1,47 @@
+<html>
+	<head>
+ 		<title>редактировать [%element.description%]</title>
+		<script src='./main.js'></script>
+		<script language="javascript" type="text/javascript" src="./ajax.js"></script>
+		<script language="javascript" type="text/javascript" src="./svcalendar.js"></script>
+		[%IF element.use_wysiwyg%]
+			<script language="javascript" type="text/javascript" src="/tinymce/tiny_mce.js"></script>
+			<script language="javascript" type="text/javascript" src="/tinymce/head.js"></script>			
+		[%END%]
+		[%IF element.use_codelist%]
+			<script language="javascript" type="text/javascript" src="/js-modules/editarea/edit_area_full.js"></script>
+		[%END%]
+		<style>
+			table {width: 100%;}
+			input.txt {width: 300px;}
+			td {font-family: arial; font-size: 10pt;}
+			#ifr {width: 0; height: 0; border: none;}
+		</style>
+	</head>
+	<body>
+		<p><b>[%element.description%]</b></p>
+		<iframe name='ifr' id='ifr'></iframe>
+		<form method='post' enctype='multipart/form-data' target='ifr'>
+			<input type='hidden' name='action' value='[%action%]'>
+			<input type='hidden' name='config' value='[%sys.config%]'>
+			[%IF action=='add' && element.tree_use && element.parent_id
+				# ДЛЯ СОЗДАНИЯ ДОЧЕРНИХ ЭЛЕМЕНТОВ ДЕРЕВА
+			%]
+				<input type='hidden' name='parent_id' value='[%element.parent_id%]'>
+			[%END%]
+			[%IF action=='update'%]<input type='hidden' name='cur_id' value='[%cur_id%]'>[%END%]
+			<input type='hidden' name='field' value='[%sys.field_name%]'>
+			<input type='hidden' name='id' value='[%sys.key%]'>
+			<table align='center'>
+			[%FOREACH e IN element.fields%]
+				[%IF e.not_out_in_form%][%NEXT%][%END%]
+				<tr><td>[%e.description%]</td><td>[%e.field%]</td></tr>
+			[%END%]
+			[%IF !(element.read_only || element.readonly)%]
+				<tr><td colspan='2' align='center'><input type='submit' value='[%IF action=='update'%]изменить[%ELSE%]добавить[%END%]'></tr>
+			[%END%]
+			</table>
+		</form>
+		
+	</body>
+</html>

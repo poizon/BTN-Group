@@ -1,0 +1,197 @@
+<HTML>
+<HEAD>
+<TITLE>
+    Загрузчик xls
+</TITLE>
+
+<STYLE type="text/css">
+<!--
+    s1elect{width:100px;}
+    table{border-spacing:0px;}
+    td{font-size:12px;vertical-align:top;}
+    td{padding:5px;}
+    table.price1 {border-spacing:1px;background-color:#b0b0b0;}
+    table.price1 td{border-style:solid;border-width:0px;border-left-width:0px;background-color:white;}
+    table.price1 td.head {background-color:#9090c0;color:white;}
+    td.sel{background-color:#a0a0f0;}
+    td.sel select{width:100px;}
+    body{font-size:14px;padding:20px;}
+    .red{color:red;}
+    .green{color:green;}
+-->
+</STYLE>
+
+<SCRIPT type="text/javascript" language="JavaScript">
+var n=30;
+var mtid='mtimer';
+var mtimerID;
+function show_msg(t){
+    var msg='test';
+    if(t=='wait')msg='Дождитесь завершения обработки файла.';
+    document.write('<div id="messaga">'+msg+'</div>');
+}
+</SCRIPT>
+
+</HEAD>
+<BODY>
+
+
+[%
+  IF is_debug;
+    "---<BR>";
+    #FOREACH h IN bg;
+    #    "${h.r}: ${h.c}, ${h.c_rgb}<BR>";
+    #END;
+    FOREACH k IN bgh.keys;
+        "$k: ${bgh.$k}<BR>";
+    END;
+    "<BR>---<BR>";
+  END;
+%]
+
+
+
+[% IF is_form %]
+<P>
+<FORM enctype="multipart/form-data" method="POST">
+    <INPUT type="hidden" name="a" value="upload_file">
+    <INPUT type="hidden" name="config_id" value="[% form.config_id %]">
+    Укажите файл прайс-листа для загрузки<BR>
+	<FONT size="-2">(формат MS Excel 97-2003)</FONT><BR>
+    <BR>
+    <INPUT type="file" name="filename"><BR>
+    <BR>
+    <INPUT type="submit" value="  Загрузить  ">
+</FORM>
+</P>
+[% END %]
+
+
+[% IF is_setup %]
+
+<FORM method="POST">
+    <INPUT type="hidden" name="a" value="parse">
+    <INPUT type="hidden" name="new_filename" value="[% form.new_filename %]">
+    <INPUT type="hidden" name="config_id" value="[% form.config_id %]">
+
+ <table width="100%">
+
+  <tr>
+
+   <td>
+
+[% IF 1 %]
+    <table>
+    [% FOREACH f IN fields %]
+		[% NEXT IF f.core %]
+
+		[% col_data=config.cols.${f.name} %]
+            <tr>
+            <td align="right">
+                [% f.header %]
+            </td>
+            <td>
+                <nobr>
+                [% FOR i IN [1,2,3,4,5,6] %]
+				[% cur_col=col_data.shift %]
+                <SELECT name="[% f.name _ "_$i" %]">
+                    <OPTION value="---">---</OPTION>
+                    [% FOR ci IN cols -%]
+                    <OPTION value="[%ci%]"[% IF cur_col == ci %] selected[% END %]>Столбец [%ci%]</OPTION>
+                    [% END %]
+                </SELECT>
+                [% LAST IF NOT f.concat %]
+                [% END %]
+                </nobr>
+            </td>
+            </tr>
+    [% END %]
+    </table>
+[% END %]
+
+   </td>
+
+   <td>
+
+    <p style="color:red;">
+        Отметьте в левом столбце строку, в которой находится шапка прайса.
+    </p>
+
+    <p>
+        Слева сделайте выборку, из каких столбцов составлять поле.
+    </p>
+
+	[% IF config.is_choose_rubric %]
+    <p>
+        Рубрика для загрузки:
+		<select name="tree_id">
+				<option value="">--- По умолчанию ---</option>
+			[% FOREACH r IN tree_id_list %]
+				<option value="[% r.id %]">[% r.header %]</option>
+			[% END %]
+		</select>
+    </p>
+	[% END %]
+        
+    <p>
+        <label><input type="checkbox" name="items_only" value="1" /> Загрузка товаров по ID рубрик</label>
+    </p>
+    <p>
+		<label><input type="checkbox" name="delete_before_insert" value="1" /> Очистка таблицы перед загрузкой</label>
+	</p>    
+    <p>
+            &nbsp;<br>
+            <INPUT type="submit" value="  Загрузить  ">
+    </p>
+        
+   </td>
+
+  </tr>
+
+  <tr>
+
+   <td colspan="2" align="center">
+
+            [% price %]
+
+   </td>
+
+  </tr>
+
+ </table>
+
+</FORM>
+
+[% END %]
+
+
+
+[% IF is_parsed %]
+    Обработка файла закончена.<BR>
+
+	[% IF 0 %]
+    Добавлено
+		<B>[% insert_cnt %]</B> товаров
+		в <b>[% insert_group_cnt %]</b> разделов.
+	[% END %]
+
+	Новых разделов: <b>[% insert_group_cnt %]</b><br>
+	Новых товаров: <b>[% insert_cnt %]</b><br>
+	Обновлено товаров: <b>[% updated_cnt %]</b><br>
+
+[% END %]
+
+
+
+[% IF is_debug %]
+<div style="display:[% IF is_debug %] block [% ELSE %] none [% END %];">
+HEAP: [% heap %]<BR>
+<br>
+</div>
+[% END %]
+
+
+
+
+</BODY>
+</HTML>

@@ -1,0 +1,31 @@
+[% BLOCK old_pagination %]
+
+[% END %]
+
+[% href = const.PATH_INFO IF !(href) ; href = href | get_url %]
+[% IF maxpage> 1%]
+<ul class="list ibs pages[% ' mb-50' IF page_type == 'partner/list' %]">
+  [% len_block = 5 ; IF page> 1 %]
+    <li class="item"><a class="link" href="[% href ; '?page=' _ (page - 1) IF (page - 1)> 1 ; add_params.replace('^\?','&') %]">&lt;&lt;</a></li>
+  [% END ; cur_page = 1 %]
+  [% WHILE (cur_page <= maxpage) %] 
+    [% IF cur_page == 1 && page != cur_page %]
+      <li class="item"><a class="link" href="[% href _ add_params %]">[% cur_page %]</a></li>
+    [% ELSIF (cur_page == 1 && page == cur_page) || cur_page == page %]
+      <li class="item active">[% cur_page %]</li>
+    [% ELSIF cur_page < ( page - len_block ) %]
+      <li class="item">...</li>
+      [% cur_page = ( page - len_block ) ; NEXT %]
+    [% ELSIF cur_page> ( page + len_block ) %]
+      <li class="item">...</li>
+      [% LAST %]
+    [% ELSE %]
+      <li class="item"><a class="link" href="[% href %]?page=[% cur_page _ add_params.replace('^\?','&') %]">[% cur_page %]</a></li>
+    [% END %]
+    [% cur_page = cur_page + 1 %]
+  [% END %]
+  [% IF cur_page < maxpage %]
+    <li class="item"><a class="link" href="[%href%]?page=[% (page + 1) _ add_params.replace('^\?','&') %]">&gt;&gt;</a></li>
+  [%END%]
+</ul>
+[%END%]

@@ -1,0 +1,4 @@
+[%IF !field.name%]
+	Внимание! отсутстсвует имя! ([%field.type%])
+[%END%]
+<input type='checkbox' id='c_[%field.name%]' OnClick='mix_filter("[%field.type%]","[%field.name%]","[%field.description%]")'>&nbsp;[%field.description%]<br/>

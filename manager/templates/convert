@@ -1,0 +1,8 @@
+#!/bin/bash
+for f in `ls *.{pl,pm}` ; do
+    echo $f
+    cat $f | tr -d '\r' >$f\_
+    mv $f\_ $f
+    chmod 775 $f
+done
+

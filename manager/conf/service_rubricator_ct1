@@ -1,0 +1,71 @@
+our %form=(
+	title => 'Рубрикатор услуг',
+	work_table => 'service_rubricator',
+	work_table_id => 'id',
+	make_delete => '1',
+	default_find_filter => 'header',
+	read_only => '0',
+	tree_use => '1',
+	sort=>1,
+	events=>{
+		permissions=>q{
+			# 1. Определяем template_id
+			my $sth=$form->{dbh}->prepare("SELECT template_id from domain where project_id=?");
+			$sth->execute($form->{project}->{project_id});
+			my $template_id=$sth->fetchrow();
+			
+			# 2. узнаём resize_for_service
+			$sth=$form->{dbh}->prepare("SELECT value from template_group_site where template_id=? and header='resize_for_service'");
+			$sth->execute($template_id);
+			my $value=$sth->fetchrow();
+			# 3. подменяем переменную в фото
+			foreach my $f (@{$form->{fields}}){
+				if($f->{name} eq 'photo'){
+					$f->{converter}=~s!\[%resize_for_service%\]!$value!;
+					last;
+				}
+			}
+		},
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		}
+	},
+	max_level=>'0',
+	work_table_foreign_key=>'project_id',
+	work_table_foreign_key_value=>'[%project_id%]',
+	fields =>
+	[
+		{
+			name => 'header',
+			description => 'Наименование',
+			type => 'text',
+		},
+		{
+			description=>'Фото',
+			name=>'photo',
+			type=>'file',
+			converter=>q{./plugins/picture/resize.pl [%filename%]  --output_file='[%input%]_mini1.[%input_ext%]' --size='[%resize_for_service%]'},
+			filedir=>'../files/project_[%project_id%]/service',
+			before_delete_code=>q{
+				if($element->{file_for_del} =~m/^(.+)\.([^\.]+)$/){
+					unlink("$element->{filedir}/$1\_mini1.$2");
+				}
+			}
+		},
+		{
+			name=>'anons',
+			description=>'Анонс',
+			type=>'textarea',
+			style=>'width: 300px; height: 100px;',
+		},
+		{
+			name=>'body',
+			type=>'wysiwyg',
+			description=>'Описание',
+		},
+	]
+);

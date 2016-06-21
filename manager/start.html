@@ -1,0 +1,51 @@
+<html>
+	<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1251" />
+<meta http-equiv="description" content="" />
+<meta http-equiv="keywords" content="" />
+<title>Untitled Document</title>
+<link href="css/style.css" rel="stylesheet" type="text/css" media="screen, projection" />
+<script src="http://code.jquery.com/jquery-2.1.1.js"></script>
+<!--// Незабываем прописывать и здесь путь к файлам и в файле ie.css  //-->
+<!--[if lte IE 8]>
+<link href="css/ie.css" rel="stylesheet" type="text/css" media="screen, projection" />
+<script type="text/jscript" src="javascript/ie.pack.js"></script>
+<![endif]-->
+
+	<style>
+	#tomain { float: right; font-size: 1.5em; }
+	</style>
+
+	<script>
+	$(document).ready(function () {		
+	 $('#tomain').click(function () {
+	  var url = location.href;
+	  url = url.replace(/(\/manager\/start.html)/g, '');
+	   window.open(url);
+	 });
+	});
+	</script>
+
+	</head>	
+	
+	<body style='margin: 10px;'>
+	<div class="wrapper">
+		
+	<input type='button' id='tomain' value="Перейти на сайт" />
+	
+<!--	<button onclick="logout()">Exit</button> -->
+	
+	<div class="content">
+		<br>&copy; 2008-2016 <a target="_blank" href="http://www.designb2b.ru">Web-студия "DesignB2B"</a>
+	</div>
+	</div>
+	<script>
+		function logout (){
+			var url = location.href;
+			url = url.replace('http://','http://log:out@');
+			url = url.replace(/(\/start.html)/g,'');
+			window.open(url,'_top',true);
+		}
+	</script>
+	</body>
+</html>

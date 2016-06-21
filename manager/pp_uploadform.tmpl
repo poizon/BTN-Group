@@ -1,0 +1,109 @@
+<style>
+   body { margin: 2em 0em 2em 2em ; }
+   table { width: 90%; }
+</style>
+
+[% IF page_type == 'upload' %]
+   <html>
+      <head>
+         <style>
+            body { padding: 1em; }
+         </style>
+      </head>
+   <h1>Загрузить [%type%] файл</h1>
+   
+   <form method="POST" enctype="multipart/form-data" action="">
+   <label>Очищать базу перед загрузкой данных
+   <input type='checkbox' name='clear' value='1' />
+   </label><br/><br/>
+   
+   <input type='hidden' name='action' value='upload' />
+   <input type='hidden' name='project_id' value='[% project_id %]' />
+   
+   <input type='file' name='file' />
+   
+   <br/><br/>
+   
+    <input type='submit' value='Начать' />
+   </form>
+   
+   </html>
+   
+[% END %]
+
+[% IF page_type == 'preview' %]
+
+<h1>Предпросмотр</h1>
+
+
+<p>Выберите в первой колонке строку, с которой начинают идти данные. Затем, соотнесите колонки из XLS с полями сервиса Промо.</p>
+
+<form>
+
+<input type="hidden" name="action" value="import" />
+<input type="hidden" name="filename" value="[% filename %]" />
+<input type="hidden" name="project_id" value="[% project_id %]" />
+
+
+[% FOREACH i IN DATA.0.rows %]
+[% z = loop.index %]
+ <div>
+<select name="colomnnumber_[% z %]">
+   <option value="">Не выбрано</option>
+   [% FOREACH f IN DATA.0.rows %]
+   <option [% IF loop.index==z %]selected [%END %]value="[% loop.index %]">Колонка [% loop.index %]</option>
+   [% END %]
+</select>      
+<select name="colomnfield_[% z %]">
+   <option value="">Не выбрано</option>
+   [% FOREACH f IN STRUCT %]
+   <option [% IF loop.index==z %] selected [%END %]value="[% f.name %]">[% f.description %]</option>
+   [% END %]
+</select>
+</div>
+[% END %]
+
+<br/>
+<input value="Импортировать данные" type="submit" />
+
+</form>
+
+
+
+<br/><br/>
+
+<style>
+   table#preview td { vertical-align: top; }
+</style>
+
+<table id="preview" border="1">
+<tr>
+<td/>
+[% FOREACH i IN DATA.0.rows %]
+<th>Колонка [% loop.index %]</th>
+[% END %]
+</tr>
+
+[% FOREACH i IN DATA %]
+<tr>
+ [% FOREACH f IN i.rows %]
+   [% IF loop.index == 0 %]
+   <td><input type="radio" name="datastart" value="[% loop.index %]" /></td>
+   [% END %]
+ <td>[% f.value %]</td>
+ [% END %]
+</tr>
+[% END %]
+
+</table>
+
+
+[% USE Dumper %][% Dumper.dump_html(DATA) %]
+
+
+
+[% END %]
+
+
+
+page_type [% page_type %], project_id [% project_id %]

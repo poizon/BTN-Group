@@ -1,0 +1,85 @@
+[% IF page_type == 'main' %]
+        <!--// content //-->
+        <section class="content">
+          [% IF SERVICE.size %]
+            <div class="h1">Услуги</div>
+            <ul class="list ibs services_list_1">
+              [% FOREACH SERVICE %]
+                <li class="item"><a class="link" href="[% url %]">
+                  [% IF photo %]
+                    <span class="fig"><img class="img" src="[% photo_and_path_mini2 %]" alt=""/></span>
+                  [% END %]
+                  <span class="text"><span class="in">[% header %]</span></span>
+                </a></li>
+              [% END %]
+            </ul>
+            <p><a class="all" href="/service">все услуги</a></p>
+          [% END %]
+          [% IF PARTNER.size %]
+            <div class="buy_box">
+                <div class="h2">Совместные покупки</div>
+                <div class="carousel_2 js-carousel_2"><a class="next" href="#"></a><a class="prev" href="#"></a>
+                    <div class="in">
+                        <ul class="list">
+                          [% FOREACH PARTNER %]
+                            <li class="item"><a class="link" href="[% anons || url %]">
+                              [% IF photo %]
+                                <span class="fig"><img class="img" src="[% photo_and_path_mini1 %]" alt=""/></span>
+                              [% END %]
+                              <span class="text">[% header %]</span>
+                            </a></li>
+                          [% END %]
+                        </ul>
+                    </div>
+                </div>
+                <p><a class="all" href="/partner">смотреть все</a></p>
+            </div>
+          [% END %]
+            <div class="o mb-24">
+                <div class="fr w-660">
+                    <div class="h3">О компании</div>
+                    [% content.body %]
+                </div>
+                <div class="fl w-290">
+                    <div class="h3">Акции</div>
+                    [% block_1.body %]
+                </div>
+            </div>
+          [% IF SPEC.size %]
+            <div class="deals_box">
+                <div class="h3">Спецпредложения</div>
+                <div class="carousel_3 js-carousel_3">
+                    <div class="in">
+                        <ul class="list">
+                          [% FOREACH SPEC %]
+                            <li class="item">
+                                <p class="title"><a class="link" href="[% url %]">
+                                  [% IF photo %]
+                                    <span class="fig"><img class="img" src="[% photo_and_path_mini1 %]" alt=""/></span>
+                                  [% END %]
+                                  <span class="text">[% header %]</span>
+                                </a></p>
+                                [% anons %]
+                                <p>
+                                  <span class="fr pt-4"><a class="btn_1 js-show_modal" onclick="$('#modal_send_request_message').val('[% header | htmlit %]')" href="#modal_send_request">Отправить заявку</a></span> 
+                                  [% to_p(tag='span',val=price) %]
+                                </p>
+                            </li>
+                          [% END %]
+                        </ul>
+                    </div>
+                    <nav class="tabs">
+                        <ul class="list">
+                            <li class="item"><a class="link active" href="#"></a></li>
+                            <li class="item"><a class="link" href="#"></a></li>
+                            <li class="item"><a class="link" href="#"></a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <p><a class="all" href="/spec">смотреть все</a></p>
+            </div>
+          [% END %]
+           [% layout.promo %]
+        </section>
+        <!--// end content //-->
+[% ELSE ; app.$page_type ; END %]

@@ -1,0 +1,70 @@
+[%IF (!element.read_only || element.readonly) && !element.not_create%]
+<p>
+	<a href="./load_1_to_m.pl?action=add_form&config=[%sys.config%]&field=[%sys.field_name%]&id=[%sys.key%][%IF element.parent_id%]&parent_id=[%element.parent_id%][%END%]" target="_blank">
+		<img src='/icon/new.gif' title='добавить новый элемент'> [%$element.entity_desc%]
+	</a>
+</p>
+[%END%]
+<style>
+	.slide_1_to_m {border: 1px dashed gray; border-top: 1px dashed gray;}
+	.slide_1_to_m td,.slide_1_to_m  select {font-size: 8pt;}
+	.child_1_to_m{padding-left: 30px;}
+</style>
+[%
+# Кол-во ячеек в таблице
+	columns = element.fields.size();
+	columns = columns + 1 IF element.srt;
+	#columns = ( columns + 2 ) IF ( !element.read_only && !element.readonly );
+	
+%]
+[%IF values.size()%]
+	<table class='slide_1_to_m'>
+		<tr>
+			[%'<td>&nbsp;</td>' IF (element.srt || element.tree_use)%]
+			[%FOREACH d IN desc%]<td><b>[%d%]</b></td>[%END%]
+			[%IF !(element.read_only || element.readonly)%]<td>&nbsp;</td><td>&nbsp;</td>[%END%]
+		</tr>
+	[%table_id=element.table_id%]
+	[%FOREACH v IN values%]
+	[%id=v.$table_id%]
+	<tr id='[%element.name%]_1tom_tr_[%id%]'>
+		[%IF element.srt || element.tree_use%]
+			<td>			
+				[%IF element.srt%]<a href="javascript: move({key:[%sys.key%],cur_id:[%id%],field:'[%element.name%]',config:'[%sys.config%]',down_up:1[%IF element.parent_id%],parent_id:[%element.parent_id%][%END%]})"><img src='/icon/up.jpg'></a>&nbsp;<a href="javascript: move({key:[%sys.key%],cur_id:[%id%],field:'[%element.name%]',config:'[%sys.config%]',down_up:0[%IF element.parent_id%],parent_id:[%element.parent_id%][%END%]})"><img src='/icon/down.jpg'></a>[%END%]
+				[%IF element.tree_use && (!element.max_level || element.max_level>element.cur_level)
+					# 
+				%]
+					<span id="[%sys.field_name%]_but[%id%]"><a href="javascript: load_child_1_to_m([%id%],'[%sys.field_name%]')"><img src="/icon/plusx.gif"></a></span>
+				[%END%]
+			</td>
+		[%END%]
+		[%FOREACH e IN element.fields%]
+			[%IF e.not_out_in_slide%][%NEXT%][%END%]
+			[%iv=e.value%]
+			[%en=e.name%]
+		
+			[%SWITCH e.type%]
+				[%CASE 'wysiwyg'%]
+					<td class='1_to_m_slide'>[%v.value%]</td>
+				[%CASE 'file'%]
+					<td class='1_to_m_slide'>[% v.${e.name}.replace('<input type[^>]+>','').replace('<a href=\"javascript: if[^>]+>удалить</a>','') %]</td>
+				[%CASE%]<td>[%v.$en%]</td>
+			[%END%]
+		[%END%]
+		<td><A href="./load_1_to_m.pl?action=edit&config=[%sys.config%]&id=[%sys.key%]&field=[%sys.field_name%]&cur_id=[%id%]" target="_blank"><img src='/icon/edit.gif'></td>
+		[%IF !(element.read_only || element.readonly) && element.make_delete%]		
+			<td><A href="javascript: del_1_to_m({config:'[%sys.config%]',key:[%sys.key%],field:'[%sys.field_name%]',cur_id:[%id%],name:'[%element.name%]',parent_id:'[%element.parent_id%]'})"><img src='/icon/delete.gif'></a></td>
+		[%END%]
+	</tr>
+			[%IF element.tree_use && (!element.max_level || element.max_level>element.cur_level)%]
+				<tr>
+					<td colspan="[%columns%]">					
+						<div style="display: none;" class="child_1_to_m" id="[%sys.field_name%]_sub[%id%]"></div>
+					</td>
+				</tr>
+			[%END%]
+	[%END%]
+	</table>
+[%ELSE%]
+	<p>элементы отсутствуют</p>
+[%END%]

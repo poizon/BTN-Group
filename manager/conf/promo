@@ -1,0 +1,64 @@
+our %form=(
+	title => 'Promo (дл€ оптимизаторов)',
+	work_table => 'promo',
+	work_table_id => 'promo_id',
+	make_delete => '1',
+	default_find_filter => 'url',
+	read_only => '0',
+	tree_use => '0',
+#	plugins=>($form->{project}->{project_id} == 4329 ? ['find::promo_xls'] : undef),
+	plugins=>['find::promo_xls'],
+#	plugins=>($form{project}{options}{use_external_promo_exporter} == 1 ? ['find::promo_xls'] : undef),
+#	plugins=>[],
+	add_where=> 'project_id=$form->{project}->{project_id}',	
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+			my $url=param('url');
+			my $sth=$form->{dbh}->prepare("SELECT count(*) from $form->{work_table} where project_id=? and url=?");
+			$sth->execute($form->{project}->{project_id},$url);
+			$form->{errors}=qq{ƒл€ данного проекта уже существует запись с URL'ом $url} if($sth->fetchrow());
+		}
+	},
+	fields =>
+	[
+		{
+			name => 'url',
+			description => 'url',
+			type => 'text',
+			add_description => 'url без домена',
+		},
+		{
+			name => 'promo_title',
+			description => 'promo_title',
+			type => 'text',
+
+		},
+		{
+			name => 'promo_description',
+			description => 'promo_description',
+			type => 'textarea',
+		},
+		{
+			name => 'promo_keywords',
+			description => 'promo_keywords',
+			type => 'textarea',
+		},
+		{
+			description=>'дополнительные теги',
+			add_description=>'ƒополнительные теги дл€ &lt;head&gt;, например &lt;yandex .....',
+			name=>'add_tags',
+			type => 'textarea',
+		},
+		{
+			name => 'promo_body',
+			description => 'promo_body',
+			type => 'textarea',
+		},
+	]
+);
+

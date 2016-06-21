@@ -1,0 +1,37 @@
+our %form=(
+	title => 'Файлы на сайте',
+	work_table => 'files',
+	work_table_id => 'id',
+	make_delete => '1',
+	default_find_filter => 'url',
+	read_only => '0',
+	tree_use => '0',
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		},
+	},
+	add_where=>qq{project_id = [%project_id%]},
+	fields =>
+	[
+		{
+			description=>'URL',
+			name=>'url',
+			type=>'text',
+			#uniquew=>1,
+			filter_code=>q{
+				$value="<A href='http://$form->{project}->{domain}$value' target='_blank'>http://$form->{project}->{domain}$value</a>";
+			}
+		},
+		{
+			name => 'body',
+			description => 'содержимое файла',
+			type => 'textarea'
+		}
+	]
+);
+

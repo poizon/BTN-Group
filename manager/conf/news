@@ -1,0 +1,58 @@
+our %form=(
+	title => 'Новости',
+	work_table => 'news',
+	work_table_id => 'news_id',
+	make_delete => '1',
+	default_find_filter => 'header',
+	read_only => '0',
+	tree_use => '0',
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		},
+		permissions=>q{
+			# Уникальные УРЛ'ы
+			&{$form->{PLUGINIT}->{ex_links}}('/news/[%id%]') if($form{project}->{options}->{ex_links});
+			
+			# promo в карточке
+			&{$form->{PLUGINIT}->{ex_promo}}('/news/[%id%]');
+		}
+		
+	},
+	add_where=>qq{project_id = [%project_id%]},
+	fields =>
+	[
+		{
+			name => 'header',
+			description => 'Заголовок новости',
+			type => 'text',
+		},
+		{
+			name=>'enabled',
+			description=>'Вкл',
+			type=>'checkbox',
+			value=>1
+		},
+		{
+			name => 'anons',
+			description => 'Анонс',
+			type => 'textarea',
+		},
+		{
+			name => 'body',
+			description => 'текст новости',
+			type => 'wysiwyg',
+		},
+		{
+			description=>'Дата создания',
+			name=>'registered',
+			type=>'datetime',
+			#ndefault_value=>'now()'
+		}
+	]
+);
+

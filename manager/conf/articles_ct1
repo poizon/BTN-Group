@@ -1,0 +1,78 @@
+our %form=(
+	title => 'Статьи',
+	work_table => 'article',
+	work_table_id => 'article_id',
+	make_delete => '1',
+	default_find_filter => 'header',
+	read_only => '0',
+	tree_use => '0',
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		},
+		permissions=>q{
+			# Уникальные УРЛ'ы
+			&{$form->{PLUGINIT}->{ex_links}}('/article/[%id%]') if($form{project}->{options}->{ex_links});
+			
+			# 1. Определяем template_id
+			my $sth=$form->{dbh}->prepare("SELECT template_id from domain where project_id=?");
+			$sth->execute($form->{project}->{project_id});
+			my $template_id=$sth->fetchrow();
+			
+			# 2. узнаём resize_for_news
+			$sth=$form->{dbh}->prepare("SELECT value from template_group_site where template_id=? and header='resize_for_articles'");
+			$sth->execute($template_id);
+			my $value=$sth->fetchrow();
+			# 3. подменяем переменную в фото
+			foreach my $f (@{$form->{fields}}){
+				if($f->{name} eq 'photo'){
+					$f->{converter}=~s!\[%resize_for_articles%\]!$value!;
+					last;
+				}
+			}
+		}
+		
+	},
+	add_where=>qq{project_id = [%project_id%]},
+	fields =>
+	[
+		{
+			name => 'header',
+			description => 'Заголовок новости',
+			type => 'text',
+		},
+		{
+			description=>'Фото',
+			name=>'photo',
+			type=>'file',
+			converter=>q{./plugins/picture/resize.pl [%filename%]  --output_file='[%input%]_mini1.[%input_ext%]' --size='[%resize_for_articles%]'},
+			filedir=>'../files/project_[%project_id%]/articles',
+			before_delete_code=>q{
+				if($element->{file_for_del} =~m/^(.+)\.([^\.]+)$/){
+					unlink("$element->{filedir}/$1\_mini1.$2");
+				}
+			}
+		},
+		{
+			name => 'anons',
+			description => 'Анонс',
+			type => 'textarea',
+		},
+		{
+			name => 'body',
+			description => 'текст новости',
+			type => 'wysiwyg',
+		},
+		{
+			description=>'Дата создания',
+			name=>'registered',
+			type=>'datetime',
+			default_value=>'now()'
+		}
+	]
+);
+

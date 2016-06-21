@@ -1,0 +1,18 @@
+DirectoryIndex index.pl
+AuthUserFile /dev/null
+AuthBasicAuthoritative Off
+Require valid-user
+AuthName "Auth"
+AuthType Basic
+Auth_MySQL On
+Auth_MySQL_Encryption_Types Plaintext
+Auth_MySQL_CharacterSet cp1251
+Auth_MySQL_Host 192.168.0.121
+Auth_MySQL_DB svcms
+Auth_MySQL_User svcms
+
+
+Auth_MySQL_Password_Table manager
+Auth_MySQL_Username_Field login
+Auth_MySQL_Password_Field password
+

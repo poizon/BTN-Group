@@ -1,0 +1,50 @@
+our %form=(
+config => 'content',
+db_engine => 'InnoDB',
+title => 'Статичные страницы',
+work_table => 'content',
+work_table_id => 'content_id',
+make_delete => '1',
+default_find_filter => 'header',
+read_only => '0',
+tree_use => '0',
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+			my $url=param('url');
+			my $sth=$form->{dbh}->prepare("SELECT count(*) from content where project_id=? and url=?");
+			$sth->execute($form->{project}->{project_id},$url);
+			$form->{errors}=qq{Для данного проекта уже существует запись с URL'ом $url} if($sth->fetchrow());
+		},
+		permissions=>q{
+			&{$form->{PLUGINIT}->{add_h1}} if($form->{project}{options}{add_h1});
+			if($form->{id}){				
+				my $sth=$form->{dbh}->prepare("SELECT read_only from $form->{work_table} WHERE $form->{work_table_id}=$form->{id}");
+				$sth->execute();
+				$form->{read_only}=$sth->fetchrow();
+			}
+		}
+	},
+fields =>
+[
+	{
+		name => 'header',
+		description => 'Название страницы',
+		type => 'text',
+	},
+	{
+		name => 'body',
+		description => 'Содержимое',
+		type => 'wysiwyg',
+	},
+	{
+		name => 'url',
+		description => 'url',
+		type => 'text',
+	}
+]
+);

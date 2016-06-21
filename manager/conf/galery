@@ -1,0 +1,42 @@
+our %form=(
+	title => 'Галерея',
+	work_table => 'galery',
+	work_table_id => 'galery_id',
+	make_delete => '1',
+	default_find_filter => 'header',
+	read_only => '0',
+	tree_use => '1',
+	sort=>1,
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		}
+	},
+	max_level=>'0',
+	work_table_foreign_key=>'project_id',
+	work_table_foreign_key_value=>[%project_id%],
+	fields =>
+	[
+		{
+			name => 'header',
+			description => 'Наименование',
+			type => 'text',
+		},
+		{
+			name=>'photo',
+			description=>'Фото',
+			type=>'file',
+			filedir=>'/files/project_[%project_id%]/galery',			
+			converter=>q{./plugins/picture/resize.pl [%filename%] --output_file='[%input%]_mini.[%input_ext%]' --size='162x112'},
+			before_delete_code=>q{
+				if($element->{file_for_del} =~m/^(.+)\.([^\.]+)$/){
+					unlink("$element->{filedir}/$1\_mini.$2");
+				}
+			}		
+		}
+	]
+);

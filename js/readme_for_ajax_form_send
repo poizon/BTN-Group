@@ -1,0 +1,76 @@
+1)Отправка формы через Ajax
+
+	шаблон:
+		-подключить <script src='/js/ajax_form_send.js'></script>;
+
+		-добавить в <form> атрибут id;
+
+		-добавить <input type='hidden' name='action' value='form_send'> 
+			  <input type='hidden' name='form_name' value='<имя формы>'> 
+			т.к. на странице м.б. больше 1 формы, необходимо указать <имя формы>;
+
+		-для вывода капчи добавляем <span id="response_get_captcha"><script>get_captcha('form_feedback')</script></span>;
+		
+		-для очистки полей используем функцию reset_form(<id формы>, <id response>);	
+		
+		-в button-е отправки меняем с type="submit" на type="button" onclick="form_send('<id формы>',  <id response>)"
+ 
+		- <id response> - ответ сервера по умолчанию <span id="response_form_send"></span>;
+	
+	обработчик url:
+		-Код для ^/ajax$:
+		if(param('action') eq 'form_send'){
+			if(param('form_name') eq 'feedback'){
+				# форма обратной связи
+				my $form={
+				encode=>'utf8;cp1251',
+				use_capture=>1,
+				action_field=>'action',
+				mail_send=>[
+				{
+					to=>$params->{TMPL_VARS}->{const}->{email_for_feedback},
+					subject=>'Сообщение с сайта http://'.$params->{project}->{domain},
+					message=>$params->{TMPL_VARS}->{const}->{message_for_feedback}
+				}
+				],
+				fields=>[
+					{
+						name=>'name',
+						description=>'Имя / компания',
+						regexp => '.+'
+					},
+					{
+						name=>'phone',
+						description=>'Телефон',
+						regexp => '.+'
+					},
+					{
+						name=>'email',
+						description=>'Email',
+						regexp => '.+@.+'
+					},
+					{
+						name=>'message',
+						description=>'Сообщение',
+					},
+				]
+				};
+				($params->{TMPL_VARS}->{form_errors},$params->{TMPL_VARS}->{form_vls})=&GET_FORM($form);
+				$params->{TMPL_VARS}->{page_type}='response_feedback';
+			}	
+		}
+		-Добавить шаблон для вывода ответа(возвращаем json):
+			Код:
+			[%IF form_errors==1%] 
+				{data: "[%const.feedback_ok_text%]", status: 1}	
+			[%ELSIF form_errors%] 
+				{data:"[%FOREACH e  IN form_errors%]<p style='color: red;'>[%e%]</p>[%END%]",status: 0}	
+			[%END%]
+
+	В шаблоне для url-ов:		
+		-добавить общее правило для всех url-ов ^/ajax$ ajax_form_send.tmpl;
+		
+		-создать ajax_form_send.tmpl c обработкой page_type, 
+			[%IF page_type;template = page_type _ '.tmpl'; INCLUDE "$template";ELSE; "{data: 'Ошибка: Шаблон для ответа сервера не найден', status: 0}"; END%]
+	
+

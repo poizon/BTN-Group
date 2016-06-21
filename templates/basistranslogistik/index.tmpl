@@ -1,0 +1,41 @@
+[% TRY ; VIEW layout(prefix=>'tmpl/layout/',suffix=>'.tmpl') ; END ; VIEW app(prefix='tmpl/',suffix=>'.tmpl') ; END %]
+[%# USE date(locale=>'ru_RU.CP1251') %]
+[%# MACRO df1 BLOCK ; '<' _ (tag||'div') _ ' class="' _ (cls||'date') _ '">' _ date.format(val,'%d.%m.%Y') _ '</' _ (tag||'div') _ '>' IF val && val != '0000-00-00 00:00:00' ; END %]
+[%# MACRO to_ps BLOCK ; '<' _ (tag||'div') _ ' class="' _ (cls||'price') _ '">' _ val _ '</' _ (tag||'div') _ '>' IF val ; END %]
+[% MACRO to_p BLOCK ; '<' _ (tag||'div') _ ' class="' _ (cls||'price') _ '">' _ val.split('\.').0.chunk(-3).join(' ') _ ' р.</' _ (tag||'div') _ '>' IF val> 0 ; END %]
+<!doctype html>
+<!--[if IE 7]><html class="no-js ie ie7" lang="ru"><![endif]-->
+<!--[if IE 8]><html class="no-js ie ie8" lang="ru"><![endif]-->
+<!--[if IE 9]><html class="no-js ie ie9" lang="ru"><![endif]-->
+<!--[if gt IE 9]><!--><html class="no-js" lang="ru"><!--<![endif]-->
+
+[% layout.head %]
+<body[% ' class="main_page"' IF page_type == 'main' %]>
+
+<!--[if lte IE 9]>
+<div class="browsehappy">ѕохоже, вы используете устаревшую версию Internet Explorer. ѕожалуйста, попробуйте другой
+    <a href="http://browsehappy.com/">браузер</a>, чтобы получить более полное впечатление о работе в сети.
+</div>
+<![endif]-->
+
+<!--// wrapper //-->
+<div class="wrapper">
+    <div class="inner">
+
+[% layout.header %]
+[% layout.aside %]
+[% layout.content %]
+
+    </div>
+
+[% layout.footer %]
+
+    <div class="line_top"></div>
+</div>
+
+<!--// wrapper //-->
+
+[% layout.popup %]
+
+</body>
+</html>[% CATCH ; CLEAR ; INCLUDE tmpl/error.tmpl ; END %]

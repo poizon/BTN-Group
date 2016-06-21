@@ -1,0 +1,53 @@
+Распаковать файл архива
+
+Необходимо скопировать все  файлы (включая .htaccess) в DocumentRoot нового проекта 
+
+Среди этих файлов будут 3 файла-дампа базы данных Mysql (в кодировке cp1251)  dump1.sql, dump2.sql, dump3.sql их необходимо загрузить в БД нового проекта 
+
+Если меняется домен проекта, необходимо в БД этого проекта выполнить команду: update domain set domain='новый_домен'; 
+
+В файле manager/connect необходимо изменить параметры для подключения к СУБД MySql
+
+Требования к ПО
+apache 2.2 (mod_cgi,mod_rewrite,mod_auth_basic,mod_auth_mysql, возможно заменить mod_auth_mysql на любой AuthBasicProvider поддерживаемый apache2-ем) 
+mysql 5.0,5.1 (с innodb,myisam)
+
+Сайт использует следующие модули PERL
+Archive::Zip    1.30                                                                                                                                                                                                                         
+Carp    1.11                                                                                                                                                                                                                                 
+CGI::Carp       3.45                                                                                                                                                                                                                         
+CGI::Cookie     1.29                                                                                                                                                                                                                         
+CGI::Fast       1.08                                                                                                                                                                                                                         
+CGI     3.49                                                                                                                                                                                                                                 
+Data::Dumper    2.124                                                                                                                                                                                                                        
+DBI     1.612                                                                                                                                                                                                                                
+File::Copy      2.14                                                                                                                                                                                                                         
+HTML::Template  2.9                                                                                                                                                                                                                          
+Image::Info     1.28                                                                                                                                                                                                                         
+Image::Magick   6.6.0                                                                                                                                                                                                                        
+MIME::Base64    3.08                                                                                                                                                                                                                         
+MIME::Lite      3.027                                                                                                                                                                                                                        
+OpenOffice::OODoc       2.125                                                                                                                                                                                                                
+Spreadsheet::ParseExcel 0.57                                                                                                                                                                                                                 
+Spreadsheet::ParseExcel::FmtUnicode     0.57                                                                                                                                                                                                 
+Template        2.22                                                                                                                                                                                                                         
+Text::Iconv     1.7                                                                                                                                                                                                                          
+FCGI			0.71
+FCGI::ProcManager 0.19
+XML::Simple		2.18
+
+
+
+
+Конфигурация веб-сервера apache2.2 
+<VirtualHost > 
+ServerAdmin .......... 
+DocumentRoot ........... 
+ServerName ........... 
+<Directory /...../> 
+ Options MultiViews ExecCGI Includes FollowSymLinks 
+ AddHandler cgi-script .pl 
+ AllowOverride All 
+ DirectoryIndex work.pl index.html 
+</Directory> 
+</VirtualHost> 

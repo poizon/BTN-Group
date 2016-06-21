@@ -1,0 +1,120 @@
+<html>
+	<head>
+		<title>[%title%]</title>
+		<script language=JavaScript src='./filters.js'></script>
+		<script language=JavaScript src='./main.js'></script>
+		<script language=JavaScript src='./ajax.js'></script>
+		<script language=JavaScript src='./svcalendar.js'></script>
+		<script>
+			function show_filters(){
+				document.getElementById('filters').style.display='';
+				document.getElementById('f_panel').innerHTML='<a href="javascript: hide_filters();">Скрыть фильтры</a>';
+			}
+
+			function hide_filters(){
+				document.getElementById('filters').style.display='none';
+				document.getElementById('f_panel').innerHTML='<a href="javascript: show_filters();">Показать фильтры</a>';
+			}
+
+			function hide_results(){
+				document.getElementById('results').style.display='none';
+				document.getElementById('r_panel').innerHTML='<a href="javascript: show_results();">Показать результаты</a>';
+			}
+
+			function show_results(){
+				document.getElementById('results').style.display='block';
+				document.getElementById('r_panel').innerHTML='<a href="javascript: hide_results();">Скрыть результаты</a>';
+			}
+		</script>
+		<style>
+			h1 {font-size: 14pt;}
+			body {margin: 10px 0 0 10px;}
+			/*---------------------- basic styles ---------------------------------*/ 
+@import url("base.css");
+/*---------------------- end basic styles ------------------------------*/
+/*---------------------- global --------------------------------------*/
+html { overflow-y: scroll; -webkit-tap-highlight-color: rgba(0,0,0,0); -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+body { background:#fff; color:#333; font-size:.75em/*12px*/;  line-height:1.4; }
+input, button, select, label, textarea, body { font-family:Arial, Helvetica, sans-serif; }
+body, html { height:100%; }
+a { color:#278ac5; }
+a:visited { }
+a:hover, .n-u a { text-decoration:none; }
+a:focus { }
+a:active { }
+a.dash, .dash a { text-decoration:none; border-bottom:1px dashed; }
+a.dash:hover, .dash a:hover { border:0; }
+:focus { outline: none; }
+.h2 { color:#333333;
+font-weight: bold;
+padding:10px 0 15px 15px;
+font-family:'HeliosCondRegular', Arial, Helvetica, sans-serif;
+font-size:2.1666em/*26px*/;
+ }
+.error-text{ color:#f00; }
+/*end colors*/
+/*other*/
+hr { border:0; margin:0 0 10px; height:0; display:block; width:100%; vertical-align:top; overflow:hidden; border-top:1px dotted #bdbdbd; }
+.hr{ border-top:1px dotted #cbcbcb; margin-bottom:12px; margin-top:12px; }
+/*end other*/
+
+
+
+.btn1 {
+border:0; background:none; padding:0!important;
+text-align: left; 
+font-size:1.3333em/*16px*/;
+font-weight: bold;
+}
+input[type="text"], input[type="password"], select, textarea { padding:3px; }
+
+/*fonts*/
+/*---------------------- global --------------------------------------*/
+		</style>
+ </head>
+ <body>
+  <div class="h2">[%form.title%]</div>
+  <!-- test -->
+	[%IF !(form.not_create)%]
+		<p><a href='javascript:openWindow("[%IF (form.new_form)%][%form.new_form%][%ELSE%]./edit_form.pl?action=new&config=[%form.config%][%END%]",1000,500)'>Добавить</a></p>
+	[%END%]
+
+
+	<div id='f_panel' style='margin-bottom: 5px;'><a href='javascript: hide_filters();'>Скрыть фильтры</a></div>
+	<div id='filters'>
+		<table class='filters' width='90%'>
+			<tr>
+				<td valign='top' style='padding: 0; border: 1px solid black;' width='500'>
+					<div style='border-bottom: 1px solid black; margin: 0;'>&nbsp;<b>Использовать фильтры:</b></div>
+					<div style='margin: 10px'>
+						[%form.FILTER_LIST%]
+					</div>
+				</td>
+				<td valign='top'>
+					<form action='./find_objects.pl' method='post' target='results' name='f' OnSubmit=''>
+						<input type='hidden' name='config' value='[%form.config%]'>
+						<div id='main' class='main'></div>
+						<p>
+							<b>Фильтрация: </b><br/>
+								<input type="radio" name='and_or' value="0">&nbsp;Все совпадения<br>
+								<input type="radio" name='and_or' value="1">&nbsp;Любое из совпадений
+						</p>
+					</form>
+				</td>
+				<td align='right'></td>
+			</tr>
+			<tr>
+				<td style='text-align: center; margin-top: 10px;'><input type='button' OnClick='document.f.submit(); document.getElementById("r").style.display="block"; hide_filters();' value='поиск'></td>
+				<td></td>
+			</tr>
+		</table>
+ </div>
+
+	<div id='r' style='display: none;'>
+		<div id='r_panel'><a href='javascript: hide_results();'>Скрыть результаты</a></div>
+		<div id='results'>
+			<iframe name='results' style='width: 100%; height: 100%; border: none;' border="0"></iframe>
+		</div>
+	</div>
+	</body>
+</html>

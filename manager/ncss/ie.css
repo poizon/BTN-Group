@@ -1,0 +1,11 @@
+@charset "utf-8";
+.ib-ju { text-justify:newspaper; text-align-last:justify }
+.ib-ju, .ib-li{ *line-height:1.2; }
+ul.ib-li>li, div.ib, li.ib, p.ib, h1.ib, h2.ib, h3.ib, h4.ib, h5.ib, dl.ib, dt.ib, dd.ib, form.ib, ul.ib, ol.ib, h6.ib, ul.ib-ju>li { /*ie7*/*display:inline }
+img { -ms-interpolation-mode:bicubic }
+input[type=checkbox], input[type=radio] { margin:-3px;cursor:pointer }
+
+.ib-ju, ul, ol, .content{ *zoom:1 }
+ol{ *padding-left:2.5em; }
+.c-20, .c-25, .c-50, .c-100{ *clear:right }
+hr{ *float:left; }

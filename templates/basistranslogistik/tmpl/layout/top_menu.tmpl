@@ -1,0 +1,20 @@
+<nav class="nav">
+  <ul class="list">
+    [% FOREACH top_menu %]
+      <li class="item[% ' active' IF act == 1 || ( const.PATH_INFO.match(url) && url != '/' ) %]">
+        <a class="link" href="[% url %]"><span class="text">[% header %]</span></a>
+        [% IF child.size %]
+          <div class="rel">
+            <div class="sub">
+              <ul class="sub_menu list">
+                [% FOREACH child %]
+                  <li class="item"><a class="link" href="[% url %]">[% header %]</a></li>
+                [% END %]
+              </ul>
+            </div>
+          </div>
+        [% END %]
+      </li>
+    [% END %]
+  </ul>
+</nav>

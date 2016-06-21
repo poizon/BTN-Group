@@ -1,0 +1,126 @@
+# редиректы
+$form->{PLUGINIT}->{site_redirect}=sub{ 
+	my($in,$table)=@_;
+	$ext_url='pligin_add_h1_h1';
+	if($ENV{SCRIPT_NAME}=~m/admin_table\.pl$/ || $ENV{SCRIPT_NAME}=~m/find_objects\.pl$/){ 
+		# ‘»Ћ№“–џ
+		# 
+		my $in_flt=$in;		
+		
+		$in_flt=~s/\[%id%\]//;
+#		$project_id = $form->{dbh}->selectrow_array("SELECT project_id FROM struct WHERE struct_id = ?",undef,param('config'));
+		$project_id = $form->{project}{project_id};
+		
+		@{$form->{fields}}=(
+		{
+				description=>'H1',
+				type=>'filter_extend_text',
+				name=>'add_h1',
+				filter_table=>'h1_tags', 
+				db_name=>'h1',
+#				debug=>1,
+				extend_where=>qq{h1_tags.id = wt.$form->{work_table_id} and h1_tags.table_name='$form->{work_table}'},
+				#qq{h1_tags.table_name='$form->{work_table}'},				
+#				extend_where=>'in_ext_url.in_url = concat("'.$in_flt.'",wt.'.$form->{work_table_id}.') AND in_ext_url.project_id = '.$project_id,
+#				extend_where=>qq{in_ext_url.in_url = concat('$in_flt',wt.$form->{work_table_id}) AND in_ext_url.project_id = $project_id},
+				left_join=>1
+			},
+			@{$form->{fields}}
+		)
+	}
+	elsif($ENV{SCRIPT_NAME}=~m/\/edit_form\.pl$/){ 
+		#print "777";
+		my $val;
+		if($form->{id}){
+#			$in=~s/\[%id%\]/$form->{id}/g;			
+			$in=$form->{id};
+#			print "ID: <i>$in</i><br>";
+			if(param('config') ne 'content'){
+#			$val=$form->{dbh}->selectrow_array("
+				my $sth=$form->{dbh}->prepare("SELECT h1 FROM h1_tags WHERE project_id=? AND id=? AND table_name = (SELECT table_name FROM struct WHERE project_id=? AND struct_id=?)");
+				$sth->execute($form->{project}->{project_id},$in,$form->{project}{project_id},param('config'));
+				$val=$sth->fetchrow();
+			}else{
+				$val=$form->{dbh}->selectrow_array("SELECT h1 FROM h1_tags WHERE project_id = ? AND id = ? AND table_name = 'content'",undef,($form->{project}{project_id},$in));
+			}
+		}
+		
+		my $field={
+			description=>'H1',
+#			add_description=>'например /novosti/politika/raspil/nadoel',
+			type=>'code',
+			code=>sub{return qq{<input type="text" class="input" value="$val" name="pligin_add_h1_h1">}},
+			name=>'add_h1'
+		};
+		#use Data::Dumper;
+		#print '<pre>'.Dumper($form->{fields}).'</pre>';
+		@{$form->{fields}}=($field,@{$form->{fields}});
+
+# ========================================		
+# ‘”Ќ ÷»я ћќƒ»‘»÷»–ќ¬јЌ»я URL'а
+# ========================================
+		my $after_modified=sub{
+#		        print "FID: $form->{id}<br>";	
+			#$in=~s/\[%id%\]/$form->{id}/g;
+			$in=$form->{id};
+#			print "id: <b>$in</b><br>";
+			my $ext=param('pligin_add_h1_h1');
+#			print $ext;
+			my $table_name= param('config') eq 'content' ? 'content' : $form->{dbh}->selectrow_array("SELECT table_name FROM struct WHERE project_id = ? AND struct_id=?",undef,($form->{project}{project_id},param('config')));
+#			print $table_name;
+
+			if($ext){	# ≈сли указан уникальный URL
+			#	my $sth=$form->{dbh}->prepare("SELECT count(*) from h1_tags WHERE project_id=? AND id=? AND table_name=? AND h1 = ?");
+			#	$sth->execute($form->{project}->{project_id}, $in,$table_name,$ext);
+#				print $t;
+			#	unless($sth->fetchrow()){				
+#					print "HELLO";
+					#$table_name=$form->{dbh}->selectrow_array("SELECT table_name FROM struct WHERE project_id = ? AND struct_id=?",undef,($form->{project}{project_id},param('config');
+					$sth=$form->{dbh}->prepare("REPLACE INTO h1_tags (project_id,id,table_name,h1) values(?,?,?,?)");
+					$sth->execute($form->{project}->{project_id},$in,$table_name,$ext);
+			#	}
+			#	else{ # ошибка 
+			#		$form->{errors}.=qq{<br/> ака€-то ошибка во врем€ замены};
+			#	}
+				
+			}
+			else{				
+				my $sth=$form->{dbh}->prepare("DELETE FROM h1_tags WHERE project_id=? and id=? AND table_name=?");
+				$sth->execute($form->{project}->{project_id},$in,$table_name);
+			}
+			
+			foreach my $f (@{$form->{fields}}){
+				if($f->{name} eq 'add_h1'){
+					$f->{code}=sub{return qq{<input type="text" value="$ext" name="pligin_add_h1_h1">}};
+					last;
+				}
+			}
+		};		
+
+		
+		# модифицируем событи€
+		$form->{events}->{after_insert}=&add_code_to_event($form->{events}->{after_insert},\&$after_modified);		
+		$form->{events}->{after_update}=&add_code_to_event($form->{events}->{after_update},\&$after_modified);
+	}
+	elsif($ENV{SCRIPT_NAME}=~m/\/delete_element\.pl$/){
+	# ========================================
+# ‘ункци€ очистки таблицы in_ext_url при удалении записи из work_table
+# ========================================
+		my $before_delete=q{
+			#$in=~s/\[%id%\]/$form->{id}/g;
+			#print "111";
+			#my $sth=$form->{dbh}->prepare("DELETE FROM in_ext_url WHERE project_id=? and in_url='?'");
+			#print "222";
+			#$sth->execute($form->{project}->{project_id},$in);			
+		};
+		
+		unless($form->{events}->{before_delete}){
+			$form->{events}->{before_delete}=$before_delete;
+		}
+		else{
+			$form->{events}->{before_delete}=&add_code_to_event($form->{events}->{before_delete},$before_delete);
+		}
+		
+	}
+}
+

@@ -1,0 +1,57 @@
+        <!--// header //-->
+        <header class="header">
+            <div class="to_main"><a class="link" href="/">На главную</a></div>
+            <div class="callback"><a class="link js-show_modal" href="#modal_callback"><span class="text">Заказать обратный звонок</span></a></div>
+            <div class="logo"><a class="link" href="/"></a></div>
+            <div class="slogan">[% const.slogan %]</div>
+            <div class="phone">
+                <ul class="list">
+                    <li class="item">
+                        <p><span class="number">[% const.phone %]</span></p>
+                        <p>(многоканальный)</p>
+                    </li>
+                    <li class="item">
+                        <p><span class="number">[% const.phone_2 %]</span></p>
+                        <p>(круглосуточно)</p>
+                    </li>
+                </ul>
+            </div>
+            <div class="send_request"><a class="link js-show_modal" href="#modal_send_request">Отправить заявку</a></div>
+            [% layout.top_menu %]
+            [% IF IMAGES.size %]
+            <div class="promo_box">
+                <div class="o">
+                    <div class="carousel_1 js-carousel_1">
+                        <ul class="list">
+                          [% FOREACH IMAGES %]
+                            <li class="item[% ' active' IF loop.first %]">
+                                <div class="fig"><img class="img" src="[% photo_and_path_mini1 %]" alt=""/></div>
+                                <div class="text">
+                                    <div class="title">[% header %]</div>
+                                    [% body %]
+                                    <p><a class="more" href="[% anons %]">подробнее</a></p>
+                                </div>
+                            </li>
+                          [% END %]
+                        </ul>
+                        <nav class="tabs">
+                            <ul class="list">
+
+                            </ul>
+                        </nav>
+                    </div>
+                    [% IF TOP_CATALOG.size %]
+                    <ul class="list catalog_list_1">
+                      [% FOREACH TOP_CATALOG %]
+                        <li class="item"><a class="link" href="[% url %]">
+                          [% IF photo %]<span class="fig"><img class="img" src="[% photo_and_path_mini3 %]" alt=""/></span>[% END %]
+                          <span class="text"><span class="in">[% header %]</span></span>
+                        </a></li>
+                      [% END %]
+                    </ul>
+                    [% END %]
+                </div>
+            </div>
+          [% END %]
+        </header>
+        <!--// end header //-->

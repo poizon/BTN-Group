@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>Конфигуратор</title>
+        <style>
+            a:link,a:visited,a:hover{
+                color: #000099;
+                text-decoration: none;
+            }
+            div {font-family: arial; font-size: 10pt;}
+            .configlist{
+                margin-left: 20px;
+            }
+        </style>
+        <script src='../main.js'></script>
+        <script src='../ajax.js'></script>
+        <script>
+        	function load_profile_attr(profile){
+        		document.getElementById('profile_set').innerHTML='http://crm/admin/construct/construct.pl?action=load_profile&profile='+profile;
+        		loadDoc('./construct.pl?action=load_profile&profile='+profile, 'profile_set');
+        	}
+        </script>
+    </head>
+    <body>
+        <p>Список конфигов</p>
+				<p><a href='./edit_conf.pl?action=new'>создать новый конфиг</a></p>
+				<div>
+				<form>
+					<input type='hidden' name='action' value='create_from_profil'>
+					<p>Конфиг из профиля:</td><td>[%profile_fld%]</p>
+					<div id='profile_set'>
+					</div>
+
+				</form>
+				</div>
+				<hr>
+        <div class='configlist'>
+            [%FOREACH c IN configs%]
+                <a href="./edit_conf.pl?action=edit&file=[%c.file%]">[%c.title%] ([%c.file%])</a><br/>
+            [%END%]
+        </div>
+    </body>
+</html>

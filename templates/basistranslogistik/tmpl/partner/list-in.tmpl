@@ -1,0 +1,15 @@
+[% import(content) %]
+        <!--// content //-->
+        <section class="content">
+            [% layout.path_info %]
+            <div class="h1">[% h1 ? h1 : header %]</div>
+            [% IF photo %]
+              <div class="fig_2"><a class="link js-lightbox" href="[% photo_and_path_mini3 %]" title="[% header | htmlit %]">
+                <img class="img" src="[% photo_and_path_mini2 %]" alt=""/></a></div>
+            [% END %]
+            
+            [% body %]
+            <p class="cb mb-34"><a class="back" onclick="history.back()">назад</a></p>
+            [% layout.promo %]
+        </section>
+        <!--// end content //-->

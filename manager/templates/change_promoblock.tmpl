@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<title>Выбор промо-блока для проекта</title>
+		<style>
+			h2 {font-size: 16px; text-align: center;}
+			body {margin: 16;}
+		</style>
+		<script>
+		function set_change(n){
+			for(i=1; i<[%promolist.size()%]; i++){
+				document.getElementById('d'+i).style.border='none'
+			}
+			document.getElementById('d'+n).style.border='5px solid green'
+		}
+		</script>
+	</head>
+	<body>
+		<iframe name="ifr" style="width: 0; height: 0; border: none;"></iframe>
+		<h1>Выбор промо-блока</h1>
+		<center>
+		
+		<div id="d0"><a href="?action=set_promo&promoblock_id=0" OnClick="set_change(0)" target="ifr"><b>Использовать промо-блок по-умолчанию</b></a></div>
+		[%i=1; FOREACH p IN promolist%]
+			<div id="d[%i%]"[%IF cur_promo == p.id%] style="border: 5px solid green;"[%END%]>
+				[%p.header%]<br/>
+				<a href="../files/typesites/promoblock/[%p.file_big%]" target="_blank"><img src="../files/typesites/promoblock/[%p.file%]" valign="middle" width="20%"></a><br>
+				<a href="?action=set_promo&promoblock_id=[%p.id%]" OnClick="set_change([%i%])" target="ifr">выбрать</a>
+			</div>
+		[%i = i + 1 ; END%]
+		
+		</form>
+		</center>
+	</body>
+</html>

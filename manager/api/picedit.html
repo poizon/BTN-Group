@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+	<link href="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.css" rel="stylesheet">
+	<script src="/manager/javascript/jquery.min.js"></script>
+	<link rel="stylesheet" href="/manager/javascript/cropper-master/src/cropper.css"/>
+	<script src="/manager/javascript/cropper-master/src/cropper.js"></script>
+	<link rel="stylesheet" href="/manager/javascript/cropper-master/src/main.css"/>
+</head>
+<body>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-9">
+      <div class="img-container"><img src="/manager/images/pic1.png"/></div>
+    </div>
+    <div class="col-md-3">
+      <div class="docs-preview clearfix">
+        <div class="img-preview preview-lg"></div>
+        <div class="img-preview preview-md"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$('.img-container > img').cropper({
+	aspectRatio: 16/9,
+	preview:".img-preview",
+	crop: function(data) {
+    $("#dataX").val(Math.round(data.x));
+    $("#dataY").val(Math.round(data.y));
+    $("#dataHeight").val(Math.round(data.height));
+    $("#dataWidth").val(Math.round(data.width));
+    $("#dataRotate").val(Math.round(data.rotate));
+  }
+});
+</script>
+</body>
+</html>

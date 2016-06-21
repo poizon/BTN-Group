@@ -1,0 +1,18 @@
+[% import(content) %]
+        <!--// content //-->
+        <section class="content">
+            [% layout.path_info %]
+            <div class="h1">[% h1 ? h1 : header %]</div>
+          [% body %]
+            <ul class="list ibs catalog_list_2">
+              [% FOREACH LIST %]
+                <li class="item"><a class="link" href="[% url %]">
+                  [% IF photo %]
+                    <span class="fig"><img class="img" src="[% photo_and_path_mini2 %]" alt=""/></span>
+                  [% END %]
+                  <span class="text"><span class="in">[% header %]</span></span>
+                </a></li>
+              [% END %]
+            </ul>
+        </section>
+        <!--// end content //-->

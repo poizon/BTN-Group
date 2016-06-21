@@ -1,0 +1,75 @@
+#Khabusev Phanis [pmk@trade.su] 3.04.2012+
+#old managers
+#in structure need add plugins=>['find::export_xls']
+
+$form->{not_perpage}=1;
+$plugin={
+	description=>'Опции',
+#	icon=>q{/manager/plugins/find/icon_xls.jpg},
+	code_out=>q{
+		
+	
+#		use Spreadsheet::WriteExcel;
+		use Encode qw(decode);
+		use Data::Dumper;
+		#use lib '../modules/';
+		#use Mailer;
+        	#use Time::HiRes qw/ gettimeofday /;
+
+#		my $filepath	= "../files/project_$form->{project}->{project_id}/tmp_export_xls";
+#		unless ( -d $filepath){
+#			mkdir $filepath; 
+#			chmod 0777, $filepath;
+#		}
+#		my $filename	= 'export.xls';
+
+#		my $workbook	= Spreadsheet::WriteExcel->new("$filepath/$filename");
+#		my $worksheet	= $workbook->add_worksheet(decode('cp1251','лист1'));
+#		my $f		= $workbook->add_format(bottom=>1, border_color=>8,);
+
+#		my $col = 1;
+
+#		$worksheet->write("A$col",[map{decode('cp1251',$_)} @{$form->{RESULT_HEADERS}}], $f);
+#		foreach my $tr (@{$form->{RESULT}})
+#		{
+#			my $id = pop @{$tr};
+#			$col++;
+#			$worksheet->write("A$col",[map{decode('cp1251',$_)} @{$tr}], $f);
+#		}
+
+#		$workbook->close();
+#		print qq{<a href="$filepath/$filename"><span style='color: green; font-size: 12pt;'>Скачать excel-файл.</span></a>};
+		print qq{<label for="project_id">PROJECT_ID:</label><input type="text" name="project_id" id="project_id" value="$form->{project}{project_id}">};
+		
+=com	
+		my $email = $form->{dbh}->selectrow_array('SELECT email FROM managers WHERE login = ?', undef, $ENV{REMOTE_USER});
+
+		if ($email =~ /@/)
+		{
+			Mailer::send_mail(
+				{
+					to_email	=> $email,
+					subj 		=> 'XLS менеджеры',
+					body 		=> 'XLS менеджеры',
+					filepath 	=> "$filepath/",
+					file     	=> $filename,
+					filename 	=> 'managers.xls',
+				}
+			);
+
+			print qq[<span style='color: green; font-size: 12pt;'>Отчёт отправлен Вам по почте.</span>];
+		}
+		else
+		{
+			print qq[<span style='color: red; font-size: 12pt; font-weight: bold;'>В модераторе не указан ваш почтовый адрес. Отправить отчёт невозможно!</span>];
+		}
+
+		`unlink "$filepath/$filename"`;
+
+=cut
+
+
+	}
+};
+#Khabusev Phanis [pmk@trade.su] 3.04.2012-
+

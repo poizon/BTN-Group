@@ -1,0 +1,59 @@
+admin_tree_move.pl:	my $path=qq{<a href='javascript: show_razdel(0,"$mode")'>Главная </a>};
+admin_tree_move.pl:					 $path.=qq{ / <a href='javascript: show_razdel($id, "$mode")'>}.$sth->fetchrow().qq{</a>};
+admin_tree_move.pl:			$out.=qq{<a href="javascript: copy($id,'$mode')">&lt;&lt</a>&nbsp;&nbsp;}
+admin_tree_move.pl:		$out.=qq{<a href='javascript: show_razdel($id, "$mode")'>$header</a>};
+admin_tree_move.pl:			$out.=qq{&nbsp;&nbsp;<a href="javascript: copy($id,'$mode')">&gt;&gt</a>}
+admin_tree.pl:					document.getElementById('add').innerHTML="<a href='javascript: add_razdel()'><img src='/icon/new.gif'></a>"
+admin_tree.pl:	my $path=q{<a href='javascript: show_razdel(0)'>Главная </a>};
+admin_tree.pl:					 $path.=" / <a href='javascript: show_razdel($id)'>".$sth->fetchrow()."</a>";
+admin_tree.pl:		my $edit_button=qq{<a href="javascript: openWindow('./edit_form.pl?action=edit&config=$form->{config}&id=$id',800,800)"><img src='/icon/edit.gif'></a>};
+admin_tree.pl:		#my $delete_button=qq{<a href='javascript: delete_razdel($id)'><img src='/icon/delete.gif'></a>};
+admin_tree.pl:				$delete_button=qq{<a href="javascript: 
+admin_tree.pl:			$sort=qq{<td><a href='javascript: move_up($id)'><img src='/icon/up.jpg'></a>&nbsp;<a href='javascript: move_down($id)'><img src='/icon/down.jpg'></a></td>};
+admin_tree.pl:			$out.=qq{<tr>$sort<td><a href='javascript: show_razdel($id)'>$header ($cnt)</a></td><td>$edit_button</td><td>$delete_button</td></tr>};
+admin_tree.pl:	$out=qq{<div id='add'><a href='javascript: add_razdel()'><img src='/icon/new.gif'></a></div>$out} if(!$form->{max_level} || ($cur_level<$form->{max_level}));
+delete_element.pl:			<p><a href='javascript: window.close()'>[закрыть]</a></p>
+fast_load_photo_good.js:										imageLoading: './javascript/lightbox/i/lightbox-ico-loading.gif',
+fast_load_photo_good.js:										imageBtnClose: './javascript/lightbox/i/lightbox-btn-close.gif',
+fast_load_photo_good.js:										imageBtnPrev: './javascript/lightbox/i/lightbox-btn-prev.gif',
+fast_load_photo_good.js:										imageBtnNext: './javascript/lightbox/i/lightbox-btn-next.gif'
+fast_load_photo_good.js:										imageLoading: './javascript/lightbox/i/lightbox-ico-loading.gif',
+fast_load_photo_good.js:										imageBtnClose: './javascript/lightbox/i/lightbox-btn-close.gif',
+fast_load_photo_good.js:										imageBtnPrev: './javascript/lightbox/i/lightbox-btn-prev.gif',
+fast_load_photo_good.js:										imageBtnNext: './javascript/lightbox/i/lightbox-btn-next.gif'
+fast_load_photo_good.js:											imageLoading: './javascript/lightbox/i/lightbox-ico-loading.gif',
+fast_load_photo_good.js:											imageBtnClose: './javascript/lightbox/i/lightbox-btn-close.gif',
+fast_load_photo_good.js:											imageBtnPrev: './javascript/lightbox/i/lightbox-btn-prev.gif',
+fast_load_photo_good.js:											imageBtnNext: './javascript/lightbox/i/lightbox-btn-next.gif'
+fast_load_photo_good.js:											imageLoading: './javascript/lightbox/i/lightbox-ico-loading.gif',
+fast_load_photo_good.js:											imageBtnClose: './javascript/lightbox/i/lightbox-btn-close.gif',
+fast_load_photo_good.js:											imageBtnPrev: './javascript/lightbox/i/lightbox-btn-prev.gif',
+fast_load_photo_good.js:											imageBtnNext: './javascript/lightbox/i/lightbox-btn-next.gif'
+fast_load_photo_good.js:               					$(">img",button).attr("src", "./javascript/ajaxupload/load.gif");
+fast_load_photo_good.js:               					$(">img",button).attr("src", "./javascript/ajaxupload/loadstop.gif");
+fast_load_photo_good.pl:#files: fast_load_photo_good.js; ./template/fast_load_photo_good.tmpl; ./javascript/jquery-1.3.2.js; ./javascript/ajaxupload;  ./javascript/lightbox/jquery.lightbox-0.5.css; ./javascript/lightbox/jquery.lightbox-0.5.pack.js; 
+fast_load_photo_good.pl:				$good_list.="<li><a id='good_a_".$tmp->{$par->{good_table_id}}."' href='".$tmp->{photo_and_path}."' rel='lightbox'><table><tr><td><img id='good_img_".$tmp->{$par->{good_table_id}}."' alt='' src='".$tmp->{photo_and_path_mini1}."'></td></tr></table></a><div class='o'><p><a href='/good/".$tmp->{$par->{good_table_id}}."'>".$tmp->{header}."</a></p><p><button class='button' value=''><font>Загрузить</font><br><img id='load' src='./javascript/ajaxupload/loadstop.gif'/></button><input type='hidden' value='".$tmp->{$par->{good_table_id}}."'></p><p><a href='javascript:del_photo(".$tmp->{$par->{good_table_id}}.")'>удалить</a></p></div></li>";
+fast_load_photo_good.pl:				$good_list.="<li><a id='good_a_".$tmp->{$par->{good_table_id}}."' href='".$tmp->{photo_and_path}."' rel='lightbox'><table><tr><td><img id='good_img_".$tmp->{$par->{good_table_id}}."' alt='' src='".$tmp->{photo_and_path_mini1}."'></td></tr></table></a><div class='o'><p><a href='/good/".$tmp->{$par->{good_table_id}}."'>".$tmp->{header}."</a></p><p><button class='button' value=''><font>Загрузить</font><br><img id='load' src='./javascript/ajaxupload/loadstop.gif'/></button><input type='hidden' value='".$tmp->{$par->{good_table_id}}."'></p><p><a href='javascript:del_photo(".$tmp->{$par->{good_table_id}}.")'>удалить</a></p></div></li>";
+fast_load_photo_good.pl:				$good_list.="<li><a id='good_a_".$tmp->{$par->{good_table_id}}."' href='".$tmp->{photo_and_path}."' rel='lightbox'><table><tr><td><img id='good_img_".$tmp->{$par->{good_table_id}}."' alt='' src='".$tmp->{photo_and_path_mini1}."'></td></tr></table></a><div class='o'><p><a href='/good/".$tmp->{$par->{good_table_id}}."'>".$tmp->{header}."</a></p><p><button class='button' value=''><font>Загрузить</font><br><img id='load' src='./javascript/ajaxupload/loadstop.gif'/></button><input type='hidden' value='".$tmp->{$par->{good_table_id}}."'></p><p><a href='javascript:del_photo(".$tmp->{$par->{good_table_id}}.")'>удалить</a></p></div></li>";
+left.pl:<script type="text/jscript" src="javascript/ie.pack.js"></script>
+load_1_to_m.pl:				<a href="javascript:
+load_relation_tree.pl:                <a href="javascript: switch_element($tree_id,'$this_element->{name}')">
+load_relation_tree.pl:                  <a href="javascript: switch_element($tree_id,'$this_element->{name}')">
+onrun_browser.pl:           <script language="javascript" type="text/javascript" src="/tinymce/tiny_mce.js"></script>
+onrun_browser.pl:           <script language="javascript" type="text/javascript" src="/tinymce/tiny_mce_popup.js"></script>
+struct_admin_backup.pm:				$field.=qq{&nbsp;<a href="file_download.pl?config=$form->{config}&name=$element->{name}&id=$id">открыть</a> <a href="javascript: if(confirm('Вы действительно хотите удалить файл?')) document.location.href='$script?action=del_file&id=$id&config=$form->{config}&field=$element->{name}'">удалить</a>}
+struct_admin_backup.pm:				$field.=qq{&nbsp;<a href="javascript: openWindow('$element->{filedir}$element->{value}', 300, 300)">открыть</a> <a href="javascript: if(confirm('Вы действительно хотите удалить файл?')) document.location.href='$script?action=del_file&id=$id&config=$form->{config}&field=$element->{name}'">удалить</a>}
+struct_admin_backup.pm:					<p><a href='javascript: window.close()'>[закрыть]</a></p>
+struct_admin_find.pm:			$find_plug_panel.=qq{<img src="$plugin->{icon}" align="absmiddle">&nbsp;<a href="javascript: find_on_plug('$plug_file')">$plugin->{description}</a> }
+struct_admin_find.pm:         document.getElementById('f_panel').innerHTML='<a href="javascript: hide_filters();">Скрыть фильтры</a>';
+struct_admin_find.pm:         document.getElementById('f_panel').innerHTML='<a href="javascript: show_filters();">Показать фильтры</a>';
+struct_admin_find.pm:         document.getElementById('r_panel').innerHTML='<a href="javascript: show_results();">Показать результаты</a>';
+struct_admin_find.pm:         document.getElementById('r_panel').innerHTML='<a href="javascript: hide_results();">Скрыть результаты</a>';
+struct_admin_find.pm:  <div id='f_panel' style='margin-bottom: 5px;'><a href='javascript: hide_filters();'>Скрыть фильтры</a></div>
+struct_admin_find.pm:    <div id='r_panel'><a href='javascript: hide_results();'>Скрыть результаты</a></div>
+struct_admin.pm:				<div id='$div_name\_for_clear' style='display: none;'><a href="" OnClick="javascript: 
+struct_admin.pm:				<div id='$div_name\_for_clear' style='display: none;'><a href="" OnClick="javascript: 
+struct_admin.pm:				$field.=qq{&nbsp;<a href="edit_form.pl?action=file_download&config=$form->{config}&name=$element->{name}&id=$id">открыть</a> <a href="javascript: if(confirm('Вы действительно хотите удалить файл?')) document.location.href='$script?action=del_file&id=$id&config=$form->{config}&field=$element->{name}'">удалить</a>}
+struct_admin.pm:				$field.=qq{&nbsp;<a href="javascript: openWindow('$element->{filedir}$element->{value}', 300, 300)">открыть</a> <a href="javascript: if(confirm('Вы действительно хотите удалить файл?')) document.location.href='$script?action=del_file&id=$id&config=$form->{config}&field=$element->{name}'">удалить</a>}
+struct_admin.pm:					<p><a href='javascript: window.close()'>[закрыть]</a></p>
+svcalendar.js:                 string+='<td'+cur_class+'><a href="javascript: changedate(\''+save+'\','+prday+')">'+prday+'</a></td>';

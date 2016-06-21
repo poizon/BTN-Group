@@ -1,0 +1,190 @@
+use Lingua::Translit;
+#use Data::Dumper;
+$form->{PLUGINIT}->{ex_links_multiurl2}=sub{ 
+	my($in,$p1,$p2,$p3,$fields)=@_;
+	# in - осталось также
+	# p1 - вид ссылки
+	# p2 - поле для id ссылки
+	# fields - hash для языков
+	unless($in){
+		 print 'Не указан внутренний URL при запуске модуля ex_links';
+		 return;		 
+	}
+	if($ENV{SCRIPT_NAME}=~m/admin_table\.pl$/ || $ENV{SCRIPT_NAME}=~m/find_objects\.pl$/){ 
+		my $in_flt=$in;		
+		$in_flt=~s/\[%id%\]//;
+	}
+	elsif($ENV{SCRIPT_NAME}=~m/\/edit_form\.pl$/){ 
+		my $val;
+		if($form->{id}){
+			$in=~s/\[%id%\]/$form->{id}/g;
+			map {
+				my $in_url = '/'.$_->{lang}.$in;
+				my $sth=$form->{dbh}->prepare("SELECT ext_url FROM in_ext_url WHERE project_id=? and in_url=?");
+				$sth->execute($form->{project}->{project_id},$in_url);
+				my $ext_url=$sth->fetchrow();
+				$val = $ext_url;
+				$_->{ext_url} = $val;
+				my $url_field = $_->{url};
+				my $fld = {
+					description=>'URL('.$_->{lang}.')',
+					type=>'code',
+					name=>$url_field,
+					code=>sub{return qq{<input type="text" class="input" value="$ext_url" name="$url_field" id="$url_field" data-in-url="$in_url"/>}}
+				};
+				@{$form->{fields}}=($fld,@{$form->{fields}});
+			}@{$fields};
+		}
+
+# ========================================		
+# ФУНКЦИЯ МОДИФИЦИРОВАНИЯ URL'а
+# ========================================
+		my $after_modified=sub{
+			$in=~s/\[%id%\]/$form->{id}/g;
+			foreach(@{$fields}){
+				my $url_field = $_->{url};
+				my $ext=param($url_field);
+				my $in_url = '/'.$_->{lang}.$in;
+				if($ext){	# Если указан уникальныйRL
+					my $sth = $form->{dbh}->selectrow_hashref(
+						"SELECT count(*) as rows FROM in_ext_url WHERE project_id=? AND ext_url=? AND in_url <> ?",
+						undef,
+						($form->{project}{project_id},$ext,$in_url)
+					);
+				
+					unless($sth->{rows}){
+						$form->{dbh}->do(
+							"REPLACE INTO in_ext_url(project_id,in_url,ext_url) VALUES(?,?,?)",
+							undef,
+							($form->{project}{project_id},$in_url,$ext)
+						);
+					}
+					else{ # ошибка
+						$form->{errors}.=qq{<br/>Уникальный URL '$ext' для данного проекта уже существует};
+					}	
+				}
+				else{	
+					if((!param($p2)||param($p2) eq '')){			
+						my $sth=$form->{dbh}->prepare("DELETE FROM in_ext_url WHERE project_id=? and in_url=?");
+						$sth->execute($form->{project}{project_id},$in);
+						print "ttt";
+					}
+					elsif(param($p2)){
+						my $p1_ext=$p1;
+						$pp2 = param($p2);
+						$p1_ext =~ s/\[%$p2%\]/$pp2/;
+#						$p1_ext =~ s/\[%$_->{header}%]//;
+						$p1_ext =~ s/\[%header%\]//;
+
+						$flevel_pat = $p1_ext;
+						$flevel_pat =~ s/\/$//;
+					
+						$tr = new Lingua::Translit('GOST 7.79 RUS');
+						$h = Encode::decode('cp1251',param('header'));
+						my $text = $tr->translit($h);
+					
+						# Обрезаем до одного из вариантов скобок
+						$text =~ m/[\(|\)\[\]\{\}]/;
+						$t = $` ne $p1_ext && $` ne $flevel_pat ? $` : $text;			
+						# Обрезаем до 1 точки если длина больше 25
+						if(length($t) > 25){
+							$t =~ m/\./;
+							$t = $` ne $p1_ext && $` ne $flevel_pat ? $` : $t;
+						}
+
+						# Меняем пробелы на -
+						$t =~ s/ /-/g;
+						$t =~ s/[-]{2,}/-/g;
+						$t2 = $p1_ext.$t;
+					
+						# Удаляем все НЕ СИМВОЛЫ и НЕ ЦИФРЫ
+						$t =~ s/[^a-zA-Z0-9-]//g;
+						if(length($t) > 25){
+							# Разбиваем на части и склеиваем
+							@str = split('-',$t);
+							$t2=$p1_ext;
+							$s = 0;
+							foreach(@str){
+								$t2.= $s == 0 ? $_ : '-'.$_;
+								$s += length($_);
+								last if $s >= 25;
+							}
+						}
+						my $tmp = $form->{dbh}->selectrow_hashref(
+							"SELECT count(*) as rows FROM in_ext_url WHERE project_id = ? AND ext_url = ?",
+							undef,
+							($form->{project}{project_id},$t2)
+						);
+						my $url=lc($t2).($tmp->{rows} > 0 ? '-'.$tmp->{rows} : '');
+						$first_level_url = $form->{dbh}->selectrow_arrayref(
+							"SELECT ext_url FROM in_ext_url WHERE project_id = ? AND in_url = ?",
+							undef,
+							($form->{project}{project_id},'/'.$_->{lang}.$flevel_pat)
+						);
+						if($first_level_url->[0] ne ''){
+							$url1 = $url;
+							$url1 =~ s/$flevel_pat/$first_level_url->[0]/;
+							$url=$url1;
+						}
+						else{$url='/'.$_->{lang}.$url;}
+						$tmp = $form->{dbh}->selectrow_hashref(
+							"SELECT count(*) as rows FROM in_ext_url WHERE project_id = ? AND ext_url = ?",
+							undef,
+							($form->{project}{project_id},$url)
+						);
+						$url=$url.'-'.$form->{id} if($tmp->{rows} > 0);
+						$url.='/' if($p3 eq 1);
+						$form->{dbh}->do(
+							"REPLACE INTO in_ext_url(project_id,in_url,ext_url) VALUES(?,?,?)",
+							undef,
+							($form->{project}{project_id},$in_url,$url)
+						);
+						$ext=$url;
+					}
+				}
+				foreach my $f (@{$form->{fields}}){
+					if($f->{name} eq $url_field){
+						$f->{code}=sub{return qq{<input type="text" class="input" value="$ext" name="$url_field" id="$url_field" data-url1="$url1">}};
+						last;
+					}
+				}
+			}
+		};		
+
+		
+		# модифицируем события
+		$form->{events}->{after_insert}=&add_code_to_event($form->{events}->{after_insert},\&$after_modified);		
+		$form->{events}->{after_update}=&add_code_to_event($form->{events}->{after_update},\&$after_modified);
+	}
+	elsif($ENV{SCRIPT_NAME}=~m/\/delete_element\.pl$/){
+	# ========================================
+# Функция очистки таблицы in_ext_url при удалении записи из work_table
+# ========================================
+		my $before_delete=q{
+#			$in=~s/\[%id%\]/$form->{id}/g;
+#			print "111";
+			
+			$url=$form->{events}{permissions};
+			$url =~ s/\/(\w+)\//$in=$+/e;
+#			print $url;
+			print $in;
+			if($in){
+				$in='/'.$in.'/'.$form->{id};
+				my $sql="DELETE FROM in_ext_url WHERE project_id = ? AND in_url=?";
+				$form->{dbh}->do($sql,undef,($form->{project}{project_id},$in));
+#				my $sth=$form->{dbh}->prepare("DELETE FROM in_ext_url WHERE project_id=? and in_url='?'");
+	#			print "222";
+#				$sth->execute($form->{project}->{project_id},$in);			
+			}
+		};
+		
+		unless($form->{events}->{before_delete}){
+			$form->{events}->{before_delete}=$before_delete;
+		}
+		else{
+			$form->{events}->{before_delete}=&add_code_to_event($form->{events}->{before_delete},$before_delete);
+		}
+		
+	}
+}
+

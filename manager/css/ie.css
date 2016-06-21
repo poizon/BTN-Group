@@ -1,0 +1,15 @@
+ul.ib-ju { /*ie6,ie7*/*text-justify:newspaper }
+ul.ib-li li, .ib-fx, ul.ib-ju li { /*ie6,ie7*/*display:inline }
+img { -ms-interpolation-mode:bicubic }
+.fl-lt-fx { /*ie6*/_margin-right:-3px }
+.fl-rt-fx { /*ie6*/_margin-left:-3px }
+input[type=checkbox], input[type=radio] { margin:-3px }
+.radio, .checkbox { margin:-3px; cursor:pointer }
+.text, textarea, .password { border:1px solid #999 }
+.disabled{ cursor:auto!important }
+ul.ib-ju, ul, ol{ /*ie6,ie7*/*zoom:1 }
+ul.ib-ju li.und{ /*ie6,ie7*/*vertical-align:baseline }
+textarea{overflow:auto}
+ol{ /*ie6,ie7*/*padding-left:2.5em; }
+.wrapper{ /*ie6*/_height:100% }
+hr{ *margin:-7px 0; }

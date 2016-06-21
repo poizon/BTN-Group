@@ -1,0 +1,5 @@
+$DBname='svcms';
+$DBhost='192.168.8.81';
+$DBuser='svcms';
+$DBpassword='';
+$CMSpath='/www/sv-cms/htdocs';

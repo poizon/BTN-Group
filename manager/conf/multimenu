@@ -1,0 +1,54 @@
+our %form=(
+	title => 'Мультименю',
+	work_table => 'multimenu',
+	work_table_id => 'multimenu_id',
+	make_delete => '1',
+	default_find_filter => 'header',
+	read_only => '0',
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		}
+	},
+	max_level=>'0',
+	work_table_foreign_key=>'project_id',
+	work_table_foreign_key_value=>[%project_id%],
+	fields =>
+	[
+		{
+			name => 'header',
+			description => 'Наименование',
+			type => 'text',
+		},
+		{
+			name=>'url',
+			description=>'url regexp',
+			type=>'text'
+		},
+		{
+			description=>'Выводимое меню',
+			name=>'multimenu_list',
+			type => '1_to_m',	
+			table => 'multimenu_list',
+			table_id => 'multimenu_list_id',
+			sort=>1,
+			foreign_key=>'multimenu_id',
+			fields=>[
+				{
+					description=>'Название ссылки',
+					name=>'header',
+					type=>'text'
+				},
+				{
+					description=>'Ссылка',
+					name=>'url',
+					type=>'text'
+				}
+			]
+		}
+	]
+);

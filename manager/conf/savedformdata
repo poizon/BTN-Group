@@ -1,0 +1,68 @@
+our %form=(
+	title => 'Сохраненные данные форм',
+	work_table => 'form_data',
+	work_table_id => 'id',
+	make_delete => '1',
+	default_find_filter => 'name',
+	read_only => '0',
+	tree_use => '0',
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		},
+		
+	},
+	add_where=>qq{project_id = [%project_id%]},
+	fields =>
+	[
+		{
+			name => 'name',
+			description => 'ФИО',
+			type => 'text',
+			readonly=>1,			
+		},
+
+		{
+			name => 'email',
+			description => 'E-mail',
+			type => 'text',
+			readonly=>1,			
+		},
+		{
+			name => 'phone',
+			description => 'Телефон',
+			type => 'text',
+			readonly=>1,			
+		},
+		{
+			name => 'message',
+			description => 'Текст сообщения',
+			type => 'textarea',
+			readonly=>1,
+		},
+		{
+			#name => 'project_otrasl',
+			name => 'otrasl',
+			description => 'Отрасль',
+			type => 'text',
+			readonly=>1,
+		},
+		{
+			#name => 'project_city',
+			name => 'city',
+			description => 'Город',
+			type => 'text',
+			readonly=>1,
+		},				
+		{
+			description=>'Дата создания',
+			name=>'registered',
+			type=>'datetime',
+		}
+	]
+);
+

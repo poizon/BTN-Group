@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+$form->{PLUGINIT}->{url_generator}=sub{
+	my $base_url=shift;
+	my $base_url = '/' unless($base_url);
+	if($ENV{SCRIPT_NAME} =~ m/admin_table\.pl$/ || $ENV{SCRIPT_NAME} =~ m/find_object\.pl$/){
+		print "Content-Type: text/html\n\n";
+		print "<!-- test -->\n\n";
+	}
+}

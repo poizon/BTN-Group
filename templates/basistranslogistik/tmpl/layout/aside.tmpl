@@ -1,0 +1,58 @@
+[% BLOCK SERVICE_BOX ; IF SERVICE.size %]
+            <div class="h2">Услуги</div>
+            <ul class="list services_list_2">
+              [% FOREACH SERVICE %]
+                <li class="item"><a class="link" href="[% url %]">
+                  [% IF icon_1 || icon_2 %]
+                  <span class="fig">
+                    [% IF icon_1 %]
+                    <span class="fig_orange"><img class="img" src="[% icon_1_and_path_mini1 %]" alt=""/></span>
+                    [% END %]
+                    [% IF icon_2 %]
+                    <span class="fig_violet"><img class="img" src="[% icon_2_and_path_mini1 %]" alt=""/></span>
+                    [% END %]
+                  </span> 
+                  [% END %]
+                  <span class="text">[% header %]</span>
+                </a></li>
+              [% END %]
+            </ul>
+[% END ; END %]
+
+[% BLOCK CATALOG_BOX ; IF CATALOG.size %]
+            <div class="h3">Каталог</div>
+            <ul class="list catalog_list_4">
+              [% FOREACH CATALOG %]
+                <li class="item"><a class="link" href="[% url %]">
+                  [% IF photo %]
+                    <span class="fig"><img class="img" src="[% photo_and_path_mini1 %]" alt=""/></span> 
+                  [% END %]
+                  <span class="text">[% header %]</span>
+                </a></li>
+              [% END %]
+            </ul>
+[% END ; END %]
+
+[% BLOCK PARTNER_BOX ; IF PARTNER.size %]
+            <div class="buy_box_2">
+              <div class="h3">Совместные покупки</div>
+                <div class="carousel_4 js-carousel_4"><a class="next" href="#"></a><a class="prev" href="#"></a>
+                    <div class="in">
+                        <ul style="margin-left: 0px;" class="list">
+                          [% FOREACH PARTNER %]
+                            <li class="item"><a class="link" href="[% anons || url %]">
+                              [% IF photo %]
+                                <span class="fig"><img class="img" src="[% photo_and_path_mini1 %]" alt=""/></span>
+                              [% END %]
+                              <span class="text">[% header %]</span>
+                            </a></li>
+                          [% END %]
+                        </ul>
+                    </div>
+                </div>
+                <p class="ac"><a class="all" href="/partner">смотреть все</a></p>
+            </div>
+[% END ; END %]
+        
+[% IF LSIDE.size %]<aside class="side">[% INCLUDE $b FOREACH b IN LSIDE %]</aside>[% END %]
+[% IF RSIDE.size %]<aside class="side">[% INCLUDE $b FOREACH b IN RSIDE %]</aside>[% END %]

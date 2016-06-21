@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+  <script src="/manager/javascript/cropper-master/demos/js/jquery.min.js"></script>
+  <link href="/manager/javascript/cropper-master/dist/cropper.css" rel="stylesheet">
+  <script src="/manager/javascript/cropper-master/dist/cropper.js"></script>
+<style>
+*{margin:0;padding:0;}
+.img-container{height:320px;}
+.img-preview{width:300px;height:300px;}
+.img-container, .img-preview{overflow:hidden;width:100%;}
+.row{display:table;content:"";}
+.col{float:left;position:relative;}
+</style>
+</head>
+<body>
+  <h1>Интеграция CROPPER</h1>
+  [% msg_box IF msg.size %]

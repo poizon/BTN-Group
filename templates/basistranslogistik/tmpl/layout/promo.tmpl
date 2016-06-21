@@ -1,0 +1,2 @@
+[% '<hr/>' IF hr == 1 %]
+[% '<' _ (tag||'div') _ ' class="' _ (cls||'promo') _ '">' _ promo.body _ '</' _ (tag||'div') _ '>' IF promo.body %]

@@ -1,0 +1,25 @@
+[%IF !field.name%]
+	Внимание! отсутстсвует имя! ([%field.type%])
+[%END%]
+
+[%
+	tables=field.table.split(';')
+	despendences=field.despendence.split(';')
+	descriptions=field.description.split(';')
+	headers=field.table_headers.split(';')
+	names=field.name.split(';')
+	indexes=field.table_indexes.split(';')
+	where=''
+%]
+[%PERL%]
+	print '555';
+[%END%]
+
+where: [%where%]<br/>
+
+
+[%FOREACH t IN tables%]
+	table: [%t%]<br>
+[%END%]
+<input type='checkbox' id='c_[%field.name%]'
+	OnClick='mix_filter("[%field.type%]","[%field.name%]","[%field.description%]")'>&nbsp;[%field.description%]<br/>

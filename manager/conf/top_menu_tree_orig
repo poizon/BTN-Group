@@ -1,0 +1,35 @@
+our %form=(
+	title => 'Верхнее меню',
+	work_table => 'top_menu_tree',
+	work_table_id => 'top_menu_tree_id',
+	make_delete => '1',
+	default_find_filter => 'header',
+	read_only => '0',
+	tree_use => '1',
+	sort=>1,
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		}
+	},
+	max_level=>'0',
+	work_table_foreign_key=>'project_id',
+	work_table_foreign_key_value=>[%project_id%],
+	fields =>
+	[
+		{
+			name => 'header',
+			description => 'Наименование',
+			type => 'text',
+		},
+		{
+			name=>'url',
+			description=>'url',
+			type=>'text'
+		}
+	]
+);

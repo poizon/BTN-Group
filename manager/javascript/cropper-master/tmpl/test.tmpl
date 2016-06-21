@@ -1,0 +1,84 @@
+[% INCLUDE header.tmpl %]
+<div class="wrapper"> 
+  <div class="row"> 
+    <div class="col">
+      <div class="img-container"><img src="image.jpg"></div>
+    </div>
+    <div class="docs-toolbar">
+      <div class="btn-group">
+            <button class="btn btn-primary" data-method="zoom" data-option="0.1" type="button" title="Zoom In">
+              <span class="docs-tooltip" data-toggle="tooltip" title="" data-original-title="$().cropper(&quot;zoom&quot;, 0.1)">
+                <span class="glyphicon glyphicon-zoom-in"></span>
+              </span>
+            </button>
+            <button class="btn btn-primary" data-method="zoom" data-option="-0.1" type="button" title="Zoom Out">
+              <span class="docs-tooltip" data-toggle="tooltip" title="" data-original-title="$().cropper(&quot;zoom&quot;, -0.1)">
+                <span class="glyphicon glyphicon-zoom-out"></span>
+              </span>
+            </button>
+            <button class="btn btn-primary" data-method="rotate" data-option="-90" type="button" title="Rotate Left">
+              <span class="docs-tooltip" data-toggle="tooltip" title="" data-original-title="$().cropper(&quot;rotate&quot;, -90)">
+                <span class="glyphicon glyphicon-share-alt docs-flip-horizontal"></span>
+              </span>
+            </button>
+            <button class="btn btn-primary" data-method="rotate" data-option="90" type="button" title="Rotate Right">
+              <span class="docs-tooltip" data-toggle="tooltip" title="" data-original-title="$().cropper(&quot;rotate&quot;, 90)">
+                <span class="glyphicon glyphicon-share-alt"></span>
+              </span>
+            </button>
+            <button class="btn btn-primary" data-method="setDragMode" data-option="move" type="button" title="Move">
+              <span class="docs-tooltip" data-toggle="tooltip" title="" data-original-title="$().cropper(&quot;setDragMode&quot;, &quot;move&quot;)">
+                <span class="glyphicon glyphicon-move"></span>
+              </span>
+            </button>
+            <button class="btn btn-primary" data-method="setDragMode" data-option="crop" type="button" title="Crop">
+              <span class="docs-tooltip" data-toggle="tooltip" title="" data-original-title="$().cropper(&quot;setDragMode&quot;, &quot;crop&quot;)">
+                <span class="glyphicon glyphicon-plus"></span>
+              </span>
+            </button>
+            <button class="btn btn-primary" data-method="clear" type="button" title="Clear">
+              <span class="docs-tooltip" data-toggle="tooltip" title="" data-original-title="$().cropper(&quot;clear&quot;)">
+                <span class="glyphicon glyphicon-remove"></span>
+              </span>
+            </button>
+            <label class="btn btn-primary" for="inputImage" title="Upload image file">
+              <input class="hide" id="inputImage" name="file" type="file" accept="image/*">
+              <span class="docs-tooltip" data-toggle="tooltip" title="" data-original-title="Import image with FileReader">
+                <span class="glyphicon glyphicon-upload"></span>
+              </span>
+            </label>
+            <!-- <button class="btn btn-primary" id="download" type="button" title="Download cropped image">
+              <span class="docs-tooltip" data-toggle="tooltip" title="Export image with &quot;getDataURL&quot;">
+                <span class="glyphicon glyphicon-download"></span>
+              </span>
+            </button> -->
+          </div>
+        </div>
+  [% IF preview.size %]
+    <div class="col">
+    [% FOREACH preview %]
+      <div class="row"><div class="col"><div class="img-preview" style="width:[% width %];height:[% height %];" ></div></div></div>
+    [% END %]
+    </div>
+  [% END %]
+  </div>
+</div>
+<script>
+var $img = $(".img-container img"), 
+    $dataX = $("#dataX"),
+    $dataY = $("#dataY"),
+    $dataHeight = $("#dataHeight"),
+    $dataWidth = $("#dataWidth");
+
+$img.cropper({
+	aspectRatio: 16/9,
+	data : {
+		x: 100,y: 100,
+		width: 300,height: 300
+	},
+	preview: ".img-preview",
+	done: function(data) {
+	} 
+});
+</script>
+[% INCLUDE footer.tmpl %]

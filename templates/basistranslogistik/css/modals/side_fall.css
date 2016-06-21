@@ -1,0 +1,17 @@
+.side_fall .modal__content {
+  opacity: 0;
+  -webkit-transform: translate(30%) translateZ(600px) rotate(10deg);
+  -ms-transform: translate(30%) translateZ(600px) rotate(10deg);
+  transform: translate(30%) translateZ(600px) rotate(10deg);
+  -webkit-transform-style: preserve-3d;
+  -ms-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-transition: all 0.3s ease-in;
+  transition: all 0.3s ease-in;
+}
+.side_fall.show .modal__content {
+  opacity: 1;
+  -webkit-transform: translate(0%) translateZ(0px) rotate(0deg);
+  -ms-transform: translate(0%) translateZ(0px) rotate(0deg);
+  transform: translate(0%) translateZ(0px) rotate(0deg);
+}

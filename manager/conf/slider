@@ -1,0 +1,36 @@
+our %form=(
+	title => 'Слайдер',
+	work_table => 'slider',
+	work_table_id => 'id',
+	make_delete => '1',
+	default_find_filter => 'header',
+	read_only => '0',
+	tree_use => '0',
+	sort=>1,
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+		}
+	},
+	max_level=>'0',
+	work_table_foreign_key=>'project_id',
+	work_table_foreign_key_value=>[%project_id%],
+	fields =>
+	[
+		{
+			name => 'header',
+			description => 'Наименование',
+			type => 'text',
+		},
+		{
+			description=>'фото',
+			name=>'photo',
+			type=>'file',
+			filedir=>'../files/project_[%project_id%]/slider'
+		}
+	]
+);

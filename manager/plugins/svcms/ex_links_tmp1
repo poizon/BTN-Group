@@ -1,0 +1,137 @@
+# оригинальные URL'ы для сущностей
+$form->{PLUGINIT}->{ex_links}=sub{ 
+	#print "777";
+	my $in=shift;
+	unless($in){
+		 print 'Не указан внутренний URL при запуске модуля ex_links';
+		 return;		 
+	}
+	$ext_url='pligin_ex_links_url';
+	if($ENV{SCRIPT_NAME}=~m/admin_table\.pl$/ || $ENV{SCRIPT_NAME}=~m/find_objects\.pl$/){ 
+		# ФИЛЬТРЫ
+		# 
+		my $in_flt=$in;		
+		
+		$in_flt=~s/\[%id%\]//;
+		$project_id = $form->{dbh}->selectrow_array("SELECT project_id FROM struct WHERE struct_id = ?",undef,param('config'));
+		
+		@{$form->{fields}}=(
+		{
+				description=>'Оригинальный URL',
+				type=>'filter_extend_text',
+				name=>'ex_links',
+				filter_table=>'in_ext_url', 
+				db_name=>'ext_url',
+#				debug=>1,
+				extend_where=>qq{in_ext_url.in_url = concat('$in_flt',wt.$form->{work_table_id})},
+#				extend_where=>'in_ext_url.in_url = concat("'.$in_flt.'",wt.'.$form->{work_table_id}.') AND in_ext_url.project_id = '.$project_id,
+#				extend_where=>qq{in_ext_url.in_url = concat('$in_flt',wt.$form->{work_table_id}) AND in_ext_url.project_id = $project_id},
+				left_join=>1
+			},
+			@{$form->{fields}}
+		)
+	}
+	elsif($ENV{SCRIPT_NAME}=~m/\/edit_form\.pl$/){ 
+		#print "777";
+		my $val;
+		if($form->{id}){
+			$in=~s/\[%id%\]/$form->{id}/g;			
+			my $sth=$form->{dbh}->prepare("SELECT ext_url FROM in_ext_url WHERE project_id=? and in_url=?");
+			$sth->execute($form->{project}->{project_id},$in);
+			$val=$sth->fetchrow();
+		}
+		
+		my $field={
+			description=>'Оригинальный URL',
+			add_description=>'например /novosti/politika/raspil/nadoel',
+			type=>'code',
+			code=>sub{return qq{<input type="text" class="input" value="$val" name="pligin_ex_links_url">}},
+			name=>'ex_links'
+		};
+		#use Data::Dumper;
+		#print '<pre>'.Dumper($form->{fields}).'</pre>';
+		@{$form->{fields}}=($field,@{$form->{fields}});
+
+# ========================================		
+# ФУНКЦИЯ МОДИФИЦИРОВАНИЯ URL'а
+# ========================================
+		my $after_modified=sub{
+			
+			$in=~s/\[%id%\]/$form->{id}/g;
+			my $ext=param('pligin_ex_links_url');			
+			
+			if($ext){	# Если указан уникальный URL
+
+				# Ниже закоментирован оригинал. Исавнин
+				my $sth=$form->{dbh}->selectrow_hashref("SELECT if(count(*) > 0,1,0) as count,ext_url FROM in_ext_url WHERE project_id = ? AND ext_url = ?",undef,($form->{project}{project_id},$ext));
+				if($sth->{count} == 0){
+					$form->{dbh}->do("REPLACE INTO in_ext_url(project_id,in_url,ext_url) VALUES(?,?,?)",undef,(
+						$form->{project}{project_id},
+						$in,$ext
+					));
+				}else{
+					if($sth->{ext_url} ne $ext){
+						$form->{errors}.=qq{<br/>Уникальный URL '$ext' для данного проекта уже существует};
+					}
+				}
+
+#				my $sth=$form->{dbh}->prepare("SELECT count(*) from in_ext_url WHERE project_id=? and ext_url=? and in_url<>?");
+#				$sth->execute($form->{project}->{project_id}, $ext, $in);
+#				unless($sth->fetchrow()){				
+#					$sth=$form->{dbh}->prepare("REPLACE INTO in_ext_url(project_id,in_url,ext_url) values(?,?,?)");
+#					$sth->execute($form->{project}->{project_id},$in,$ext);
+#				}
+#				else{ # ошибка 
+#					$form->{errors}.=qq{<br/>Уникальный URL '$ext' для данного проекта уже существует};
+#				}
+				
+			}
+			else{				
+				my $sth=$form->{dbh}->prepare("DELETE FROM in_ext_url WHERE project_id=? and in_url=?");
+				$sth->execute($form->{project}->{project_id},$in);
+			}
+			
+			foreach my $f (@{$form->{fields}}){
+				if($f->{name} eq 'ex_links'){
+					$f->{code}=sub{return qq{<input type="text" value="$ext" name="pligin_ex_links_url">}};
+					last;
+				}
+			}
+		};		
+
+		
+		# модифицируем события
+		$form->{events}->{after_insert}=&add_code_to_event($form->{events}->{after_insert},\&$after_modified);		
+		$form->{events}->{after_update}=&add_code_to_event($form->{events}->{after_update},\&$after_modified);
+	}
+	elsif($ENV{SCRIPT_NAME}=~m/\/delete_element\.pl$/){
+	# ========================================
+# Функция очистки таблицы in_ext_url при удалении записи из work_table
+# ========================================
+		my $before_delete=q{
+
+		# Исавнин, удаление записи об оригинальном url, может и не совсем хороший но рабочий способ.
+		
+			$url = $form->{events}{permissions};
+			$url =~ s/\/(\w+)\//$in=$+/e;
+			if($in){
+				$in='/'.$in.'/'.$form->{id};
+				$form->{dbh}->do("DELETE FROM in_ext_url WHERE project_id = ? AND in_url = ?",undef,($form->{project}{project_id},$in));
+			}
+			#$in=~s/\[%id%\]/$form->{id}/g;
+			#print "111";
+#			my $sth=$form->{dbh}->prepare("DELETE FROM in_ext_url WHERE project_id=? and in_url='?'");
+			#print "222";
+#			$sth->execute($form->{project}->{project_id},$in);			
+		};
+		
+		unless($form->{events}->{before_delete}){
+			$form->{events}->{before_delete}=$before_delete;
+		}
+		else{
+			$form->{events}->{before_delete}=&add_code_to_event($form->{events}->{before_delete},$before_delete);
+		}
+		
+	}
+}
+

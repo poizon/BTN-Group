@@ -1,0 +1,86 @@
+[% USE CGI %]
+[% BLOCK OLD %]
+<style>
+   body { margin: 2em 0em 2em 2em ; }
+   table { width: 90%; }
+</style>
+
+[%# IF page_type == 'upload' %]
+[% END %]
+   <html>
+      <head>
+         <style>
+            body { padding: 1em; }
+         </style>
+      </head>
+   <body>
+
+[% BLOCK upload %]
+   <h1>Загрузить [%type%] файл</h1>
+   <form method="POST" enctype="multipart/form-data" action="">
+     <label>Очищать базу перед загрузкой данных
+       <input type='checkbox' name='clear' value='1' />
+     </label>
+     <br/><br/>
+   
+     <input type='hidden' name='action' value='upload' />
+     <input type='hidden' name='project_id' value='[% project_id %]' />
+     <input type='file' name='file' /> 
+     <br/><br/>
+   
+    <input type='submit' value='Начать' />
+   </form>
+[% END %]
+
+[% BLOCK preview %]
+  <h1>Предпросмотр</h1>
+  <p>Выберите в первой колонке строку, с которой начинают идти данные. Затем, соотнесите колонки из XLS с полями сервиса Промо.</p>
+  <form>
+    <input type="hidden" name="action" value="import" />
+    <input type="hidden" name="filename" value="[% filename %]" />
+    <input type="hidden" name="project_id" value="[% project_id %]" />
+    [% '<input type="hidden" name="clear" value="1"/>' IF CGI.param('clear') == 1 %]
+    [% FOREACH DATA.0.rows %]
+      <div>
+        <select name="colomnnumber_[% loop.index %]">
+          [% r_ind = loop.index %]
+          <option value="">Не выбрано</option>
+          [% FOREACH DATA.0.rows %]
+            <option[% ' selected="selected"' IF loop.index == r_ind %] value="[% loop.index %]">Колонка [% loop.index %]</option>
+          [% END %]
+        </select>      
+        <select name="colomnfield_[% r_ind %]">
+          <option value="">Не выбрано</option>
+          [% FOREACH STRUCT %]
+            <option[% ' selected="selected"' IF loop.index == r_ind %] value="[% name %]">[% description %]</option>
+          [% END %]
+        </select>
+      </div>
+    [% END %]
+    <br/>
+    <input value="Импортировать данные" type="submit" />
+
+    <style>table#preview td { vertical-align: top; }</style>
+    <table id="preview" border="1">
+      <tr>
+        <th/> 
+        [% '<th>Колонка ' _ loop.index _ '</th>' FOREACH DATA.0.rows %]
+      </tr>
+
+      [% FOREACH row IN DATA %]
+        [% row_index = loop.index %]
+        <tr>
+          [% FOREACH row.rows %]
+            [% '<td><input type="radio" name="datastart" value="' _ row_index _ '"/></td>' IF loop.first %]
+            <td>[% value %]</td>
+          [% END %]
+        </tr>
+      [% END %]
+    </table>
+  </form>
+[% END %]
+
+[% INCLUDE $page_type %]
+
+</body>
+</html>

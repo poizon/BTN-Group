@@ -1,0 +1,19 @@
+[% import(content) %]
+        <!--// content //-->
+        <section class="content">
+            [% layout.path_info %]
+            <div class="h1">[% h1 ? h1 : header %]</div>
+            <ul class="list ibs catalog_list_5">
+              [% FOREACH LIST %]
+                <li class="item"><a class="link" href="[% anons || url %]">
+                  [% IF photo %]
+                    <span class="fig"><img class="img" src="[% photo_and_path_mini1 %]" alt=""/></span> 
+                  [% END %]
+                  <span class="text">[% header %]</span>
+                </a></li>
+              [% END %]
+            </ul>
+            [% layout.paging %]
+          [% layout.promo %]
+        </section>
+        <!--// end content //-->

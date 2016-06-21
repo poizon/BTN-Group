@@ -1,0 +1,87 @@
+our %form=(
+	title => 'Банеры',
+	work_table => 'banner',
+	work_table_id => 'banner_id',
+	make_delete => '1',
+	default_find_filter => 'header',
+	read_only => '0',
+	tree_use => '0',
+	events=>{
+		before_insert=>q{
+			push @{$form->{fields}}, {
+				name=>project_id,
+				type=>"hidden",
+				value=>$form->{project}->{project_id}
+			};
+			
+			# Генерируем Ключ для баннера 
+			my $a='123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';		
+			my $str='';
+			foreach my $k (1..20){
+				$str.=substr($a,int(rand(length($a))),1)
+			}
+			
+			push @{$form->{fields}}, {
+				name=>ban_code,
+				type=>"hidden",
+				value=>$str
+			};			
+		}
+	},
+	fields =>
+	[
+		{
+			name => 'header',
+			description => 'Заголовок',
+			type => 'text',
+		},
+		{
+			name => 'attach',
+			type=>'file',
+			description => 'Изображение',
+			filedir=>'../files/project_[%project_id%]/banners'
+		},
+		{
+			name=>'link',
+			type=>'text',
+			description=>'Ссылка'			
+		},
+#pmk
+#		{
+#			description=>'Код банера',
+#			name=>'ban_code',
+#			type=>'code',
+#			code=>q{
+#				if($form->{id}){
+#					my $sth=$form->{dbh}->prepare("SELECT domain from domain where project_id=?");
+#					$sth->execute([%project_id%]);
+#					my $domain=$sth->fetchrow();
+#					
+#					$sth=$form->{dbh}->prepare("SELECT ban_code from $form->{work_table} where $form->{work_table_id}=?");
+#					$sth->execute($form->{id});
+#					my $ban_code=$sth->fetchrow();
+#					$field=qq{
+#						<script src="/js/ajax.js"/>
+#						<div>
+#							<script>
+#								document.write(loadDocAsync('http://$domain/viewimage/$ban_code'));
+#							</script>
+#						</div>
+#					};
+#					
+#					$field=~s/>/&gt;/gs;
+#					$field=~s/</&lt;/gs;
+#					$field=~s/\n/<br>/gs;
+#				}
+#			}
+#		},
+#pmk
+		{
+			name=>'enabled',
+			type=>'checkbox',
+			description=>'Вкл'			
+		},
+	]
+);
+
+
