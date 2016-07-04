@@ -70,37 +70,7 @@ sub fcgi_loop{
     $params->{dbh}->do("SET names cp1251");
     $params->{dbh}->do("SET lc_time_names = 'ru_RU'");
     
-    
-    #&test_redirect();
     &get_project_info;
-
-
-# перенес в &get_project_info
-#    if(index($::params->{project}{options},'site_redirect')>=1){
-#      my $url = $ENV{PATH_INFO};
-#	print "Content-Type: text/html\n\n";
-#	print "PI = $url\n";
-#      my @vals = ('1',$params->{project}{project_id},$url);
-#      my @whr = ('enabled=?','project_id=?','url_from=?');	
-#      my $data = $params->{dbh}->selectrow_hashref('SELECT url_to FROM site_redirect WHERE '.join(' AND ',@whr),undef,@vals);
-#	print Dumper($data);
-#      my $redir = {status=>'301 Moved Permanently'};
-#      if($data->{url_to}){
-#        $redir->{url} = 'http://' unless($data->{url_to} =~ m/^(http|https)/);
-#	$redir->{url} .= 'www.' if index($::params->{project}{options},'redirect_to_www')>=1;
-#	$redir->{url} .= $::params->{project}{domain}.$data->{url_to} if($data->{url_to} =~ m/^\//);
-#	$redir->{url} .= $data->{url_to} unless($data->{url_to} =~ m/^\//);
-#        redirect(-uri=>$redir->{url},-status=>$redir->{status}) if($redir->{url});
-#	print "Status: $redir->{status}\n\nLocation: $redir->{url}\n\n";
-#	print redirect(-location=>$redir->{url},-status=>$redir->{status}) if($redir->{url});
-#	print "Status: $redir->{status}\n";
-#	print "Location: $redir->{url}\n\n";
-#	$::params->{stop}=1;
-#	$params->{stop}=1;
-#	return;
-#      }
-#    }
-    
     
     if($params->{stop}){
         return;
@@ -113,10 +83,7 @@ sub fcgi_loop{
 		$params->{TMPL_VARS}{page_title}='Страница не найдена';
 		$params->{TMPL_VARS}{content}{header}='Страница не найдена' unless($params->{TMPL_VARS}{content}{header});
 		$params->{TMPL_VARS}{content}{body}='<p>Адрес данной страницы не существует.</p>' unless($params->{TMPL_VARS}{content}{body});
-#                $params->{TMPL_VARS}{content}={
-#                    header=>'Страница не найдена',
-#                    body=>'<p>Адрес данной страницы не существует.</p>'
-#                }
+
             }
             else{
                 my $html_404_t=qq{
@@ -151,7 +118,7 @@ sub fcgi_loop{
                   </body>
                   </html>
                 };
-                #print "Страница не найдена!!!";
+               
                 print $html_404_t;
                 return;
             }
@@ -169,7 +136,6 @@ sub fcgi_loop{
        #оверайд для сайтов с флагом постпроцессинга
         if ( index($::params->{project}->{options},'post_proccessing')>=1 || index($::params->{project}{options},'generate_description')>=1 ) {
     
-        #&mytitles();
         
         eval(q{ 
         my $template = Template->new(
@@ -326,8 +292,7 @@ sub GET_DATA{
                 }
             };
             
-            #
-            # $opt->{add_queryes}
+
 =cut
             # Протестировать
             if($opt->{get_1_to_m_data}){
