@@ -10,18 +10,18 @@ BEGIN {
 
 our $params;
 
-# Îòïðàâêà ïèñüìà ïî HTML øàáëîíó
+# ÃŽÃ²Ã¯Ã°Ã Ã¢ÃªÃ  Ã¯Ã¨Ã±Ã¼Ã¬Ã  Ã¯Ã® HTML Ã¸Ã Ã¡Ã«Ã®Ã­Ã³
 sub send_msg_html {
 	my($in) = @_;
 
-	# Äàííû î ïðîåêòå
+	# Ã„Ã Ã­Ã­Ã» Ã® Ã¯Ã°Ã®Ã¥ÃªÃ²Ã¥
 	my $prj = $::params->{project};
 	
-	# Çíà÷åíèÿ ïî óìîë÷àíèþ
+	# Ã‡Ã­Ã Ã·Ã¥Ã­Ã¨Ã¿ Ã¯Ã® Ã³Ã¬Ã®Ã«Ã·Ã Ã­Ã¨Ã¾
 	my $from = 'no-reply@'.$prj->{domain};
 	my $mail_tmpl = '/templates/mail_tmpl/';
 	my $fld = $ENV{DOCUMENT_ROOT}.$mail_tmpl;
-	my $subject = $in->{Subject} ? $in->{Subject} : 'Ñîîáùåíèå ñ ñàéòà '.$prj->{domain};
+	my $subject = $in->{Subject} ? $in->{Subject} : 'Ã‘Ã®Ã®Ã¡Ã¹Ã¥Ã­Ã¨Ã¥ Ã± Ã±Ã Ã©Ã²Ã  '.$prj->{domain};
 	my $tmpl = $in->{tmpl} ? $in->{tmpl} : 'default.tmpl';
 	my $tmpl_vars = {
 		fields=>$in->{fields},
@@ -34,14 +34,14 @@ sub send_msg_html {
 		tv=>$::params->{TMPL_VARS},
 	};
 	
-	# Ñþäà áóäåì ïèñàòü îøèáêè
+	# Ã‘Ã¾Ã¤Ã  Ã¡Ã³Ã¤Ã¥Ã¬ Ã¯Ã¨Ã±Ã Ã²Ã¼ Ã®Ã¸Ã¨Ã¡ÃªÃ¨
 	my @errors;
 	
-	push @errors,'Íå óêàçàí ïîëó÷àòåëü' if(!$in->{To} || $in->{To} eq '');
+	push @errors,'ÃÃ¥ Ã³ÃªÃ Ã§Ã Ã­ Ã¯Ã®Ã«Ã³Ã·Ã Ã²Ã¥Ã«Ã¼' if(!$in->{To} || $in->{To} eq '');
 	
 	if(!$in->{tmpl} && $in->{tmpl_type}){
 		$tmpl='order.tmpl';
-		$ubject = 'Çàêàç ñ ñàéòà '.$tmpl_vars->{site} unless $in->{Subject};
+		$subject = 'Ã‡Ã ÃªÃ Ã§ Ã± Ã±Ã Ã©Ã²Ã  '.$tmpl_vars->{site} unless $in->{Subject};
 	}
 
 	if($in->{tmpl}){
@@ -68,7 +68,7 @@ sub send_msg_html {
 	);
 
 
-# Íåîáõîäèìî äîäåëàòü ïåðåäà÷ó ôàéëîâ.	
+# ÃÃ¥Ã®Ã¡ÃµÃ®Ã¤Ã¨Ã¬Ã® Ã¤Ã®Ã¤Ã¥Ã«Ã Ã²Ã¼ Ã¯Ã¥Ã°Ã¥Ã¤Ã Ã·Ã³ Ã´Ã Ã©Ã«Ã®Ã¢.	
 	if(scalar(@{$in->{files}})){
 		foreach(@{$in->{fields}}){
 		if($_->{type} eq 'file'){
